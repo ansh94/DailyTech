@@ -3,14 +3,37 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/ars_technica"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="Techcrunch" />
+            android:title="Ars Technica" />
         <item
+            android:id="@+id/engadget"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="Hacker" />
+            android:title="Engadget" />
         <item
+            android:id="@+id/hacker_news"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="Not Hacker" />
+            android:title="Hacker News" />
+        <item
+            android:id="@+id/recode"
+            android:icon="@drawable/ic_label_black_24dp"
+            android:title="Recode" />
+        <item
+            android:id="@+id/techcrunch"
+            android:icon="@drawable/ic_label_black_24dp"
+            android:title="TechCrunch" />
+        <item
+            android:id="@+id/techradar"
+            android:icon="@drawable/ic_label_black_24dp"
+            android:title="TechRadar" />
+        <item
+            android:id="@+id/the_next_web"
+            android:icon="@drawable/ic_label_black_24dp"
+            android:title="The Next Web" />
+        <item
+            android:id="@+id/the_verge"
+            android:icon="@drawable/ic_label_black_24dp"
+            android:title="The Verge" />
     </group>
 
 </menu>
