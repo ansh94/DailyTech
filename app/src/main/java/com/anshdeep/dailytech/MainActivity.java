@@ -1,6 +1,7 @@
 package com.anshdeep.dailytech;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
@@ -39,7 +40,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, ArticlesAdapter.ArticlesAdapterOnClickHandler {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout mDrawer;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     ArticlesAdapter adapter;
     LinearLayoutManager mLinearLayoutManager;
 
-    public static final String  BASE_URL = "https://newsapi.org/v1/";
+    public static final String BASE_URL = "https://newsapi.org/v1/";
     String apiKey = "f892e1eab66242a2bc5451c34ece3e55";
     String retrofitUrlSourceName;
     List<Article> listOfArticles = new ArrayList<>();
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         mLinearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLinearLayoutManager);
-        adapter = new ArticlesAdapter(listOfArticles, this);
+        adapter = new ArticlesAdapter(listOfArticles, this, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
 
@@ -291,6 +292,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 appBar.setExpanded(true, true); //unhide app bar when new new source is chosen
                 mLinearLayoutManager.scrollToPositionWithOffset(0, 0);//scroll to top of recycler view
                 listOfArticles = response.body().getArticles();
+//                for (Article article : listOfArticles) {
+//                    Log.d("MainActivity", "article author: " + article.getAuthor());
+//                    article.setAuthor(article.getAuthor());
+//                    article.setTitle(article.getTitle());
+//                    article.setDescription(article.getDescription());
+//                    article.setUrl(article.getUrl());
+//                    article.setPublishedAt(article.getPublishedAt());
+//                    article.setUrlToImage(article.getUrlToImage());
+//
+//                }
                 adapter.setDataAdapter(listOfArticles);
                 adapter.notifyDataSetChanged();
 
@@ -317,5 +328,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public void onClick(Article article) {
+        //read share preference and call
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        String restoredSubTitle = sharedPref.getString("SUBTITLE", null);
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        intent.putExtra("Article", article);
+        intent.putExtra("Source", restoredSubTitle);
+        startActivity(intent);
     }
 }

@@ -20,11 +20,21 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
 
     private List<Article> listOfArticles;
     private Context mContext;
+    private final ArticlesAdapterOnClickHandler mClickHandler;
 
 
-    public ArticlesAdapter(List<Article> articlesList, Context context) {
+    public ArticlesAdapter(List<Article> articlesList, Context context, ArticlesAdapterOnClickHandler handler) {
         this.listOfArticles = articlesList;
         this.mContext = context;
+        mClickHandler = handler;
+    }
+
+
+    /**
+     * The interface that receives onClick messages.
+     */
+    public interface ArticlesAdapterOnClickHandler {
+        void onClick(Article article);
     }
 
     @Override
@@ -52,20 +62,6 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
         holder.publishedTime.setText(Util.manipulateDateFormat(listOfArticles.get(position).getPublishedAt()));
 
 
-
-//        //open full article description in url when title is clicked
-//        holder.title.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Uri webpage = Uri.parse(listOfArticles.get(position).getUrl());
-//                Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-//                if (intent.resolveActivity(mContext.getPackageManager()) != null) {
-//                    mContext.startActivity(intent);
-//                }
-//            }
-//        });
-
-
     }
 
     @Override
@@ -77,7 +73,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
         this.listOfArticles = newArticleList;
     }
 
-    public static class ArticleViewHolder extends RecyclerView.ViewHolder {
+    public class ArticleViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         @BindView(R.id.thumbnail) ImageView thumbnail;
         @BindView(R.id.news_title) TextView title;
@@ -87,6 +83,19 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
         public ArticleViewHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);
+            v.setOnClickListener(this);
+        }
+
+        /**
+         * This gets called by the child views during a click.
+         *
+         * @param view The View that was clicked
+         */
+        @Override
+        public void onClick(View view) {
+            int clickedPosition = getAdapterPosition();
+            Article article = listOfArticles.get(clickedPosition);
+            mClickHandler.onClick(article);
         }
     }
 

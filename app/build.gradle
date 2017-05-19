@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.anshdeep.dailytech"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -44,4 +44,10 @@ dependencies {
     // Retrofit
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+
+    // Twitter like button
+    compile 'com.github.jd-alexander:LikeButton:0.2.1'
+
+    // Chrome custom tabs
+    compile 'com.android.support:customtabs:25.3.1'
 }
