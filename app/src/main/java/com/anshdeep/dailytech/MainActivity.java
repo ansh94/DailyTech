@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     LinearLayoutManager mLinearLayoutManager;
 
 
+
     public static final String BASE_URL = "https://newsapi.org/v1/";
     String apiKey = "f892e1eab66242a2bc5451c34ece3e55";
     String retrofitUrlSourceName;
@@ -317,6 +318,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 //                    article.setUrlToImage(article.getUrlToImage());
 //
 //                }
+
+
+
                 adapter.setDataAdapter(listOfArticles);
                 adapter.notifyDataSetChanged();
 

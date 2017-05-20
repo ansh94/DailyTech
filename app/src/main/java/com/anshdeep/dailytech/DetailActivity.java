@@ -1,5 +1,7 @@
 package com.anshdeep.dailytech;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 import com.anshdeep.dailytech.api.model.Article;
 import com.anshdeep.dailytech.data.ArticleContract;
 import com.anshdeep.dailytech.util.CommonUtils;
+import com.anshdeep.dailytech.widget.ArticleWidgetProvider;
 import com.bumptech.glide.Glide;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
@@ -46,7 +49,9 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.root_view) View parentView;
 
 
+
     public static final String LOG_TAG = DetailActivity.class.getSimpleName();
+    public static final String ACTION_DATA_UPDATED = "com.anshdeep.dailytech.ACTION_DATA_UPDATED";
 
     private Article article;
     private String source;
@@ -161,6 +166,10 @@ public class DetailActivity extends AppCompatActivity {
                 } else {
                     heartButton.setLiked(false);
                 }
+//                Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
+//                DetailActivity.this.sendBroadcast(dataUpdatedIntent);
+                updateAllWidgets();
+                Log.d("DetailActivity", "Statement after intent ");
 
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -179,6 +188,14 @@ public class DetailActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void updateAllWidgets(){
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, ArticleWidgetProvider.class));
+        if (appWidgetIds.length > 0) {
+            new ArticleWidgetProvider().onUpdate(this, appWidgetManager, appWidgetIds);
+        }
     }
 
     private boolean isFavorite() {
@@ -227,6 +244,7 @@ public class DetailActivity extends AppCompatActivity {
                     );
 
 
+
                 }
                 return null;
             }
@@ -248,6 +266,8 @@ public class DetailActivity extends AppCompatActivity {
                 if (isFavorite()) {
                     getContentResolver().delete(ArticleContract.ArticleEntry.CONTENT_URI,
                             ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL + " = " + "'" + article.getUrl() + "'", null);
+
+
 
                 }
                 return null;
