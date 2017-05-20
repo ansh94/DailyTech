@@ -1,24 +1,31 @@
 package com.anshdeep.dailytech;
 
-import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.customtabs.CustomTabsClient;
 import android.support.customtabs.CustomTabsIntent;
-import android.support.customtabs.CustomTabsServiceConnection;
-import android.support.customtabs.CustomTabsSession;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.anshdeep.dailytech.api.model.Article;
+import com.anshdeep.dailytech.data.ArticleContract;
+import com.anshdeep.dailytech.util.CommonUtils;
 import com.bumptech.glide.Glide;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,19 +42,17 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.news_author_detail) TextView newsAuthor;
     @BindView(R.id.news_description_detail) TextView newsDescription;
     @BindView(R.id.btn_open_article) Button btnOpenArticle;
+    @BindView(R.id.share_button) ImageButton btnShare;
+    @BindView(R.id.root_view) View parentView;
 
 
     public static final String LOG_TAG = DetailActivity.class.getSimpleName();
 
     private Article article;
     private String source;
+    private LikeButton heartButton;
 
     // Chrome custom tab variables
-    public static final String CUSTOM_TAB_PACKAGE_NAME = "com.android.chrome";
-
-    CustomTabsClient mClient;
-    CustomTabsSession mCustomTabsSession;
-    CustomTabsServiceConnection mCustomTabsServiceConnection;
     CustomTabsIntent customTabsIntent;
 
     @Override
@@ -58,18 +63,29 @@ public class DetailActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        //set the toolbar
-//        setSupportActionBar(mToolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
         Intent intent = getIntent();
 
+
         article = intent.getParcelableExtra("Article");
-        source = intent.getStringExtra("Source");
+
+        if (intent.hasExtra("Favorite")) {
+            source = article.getSource();
+            Log.d(LOG_TAG, "source from favorites: " + source);
+        }
+
+
+        if (intent.hasExtra("Source")) {
+            source = intent.getStringExtra("Source");
+            Log.d(LOG_TAG, "source : " + source);
+        }
+
+
+        heartButton = (LikeButton) findViewById(R.id.heart_button);
         Log.d(LOG_TAG, "article title = " + article.getTitle());
         if (article != null) {
 
+            updateFavoriteButtons();
 
             //set thumbnail associated with the article
             Glide.with(this)
@@ -95,36 +111,159 @@ public class DetailActivity extends AppCompatActivity {
             btnOpenArticle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Toast.makeText(DetailActivity.this, "Button pressed", Toast.LENGTH_SHORT).show();
-                    // Launch Chrome Custom Tabs on click
-                    customTabsIntent.launchUrl(DetailActivity.this, Uri.parse(article.getUrl()));
+//
+                    if (CommonUtils.checkConnection(DetailActivity.this)) {
+                        // Launch Chrome Custom Tabs on click
+                        customTabsIntent.launchUrl(DetailActivity.this, Uri.parse(article.getUrl()));
+                    } else {
+                        Toast.makeText(DetailActivity.this, "Please turn on your internet connection to view full article!", Toast.LENGTH_LONG).show();
+                    }
+
+
+                }
+            });
+
+            btnShare.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shareArticleUrl();
                 }
             });
         }
     }
 
+    private void shareArticleUrl() {
+        String mimeType = "text/plain";
+        String title = "Share Article";
+        String newsTitle = article.getTitle();
+        String newsUrl = article.getUrl();
+
+        ShareCompat.IntentBuilder.from(this)
+                .setChooserTitle(title)
+                .setType(mimeType)
+                .setText(newsTitle + "\n" + newsUrl)
+                .startChooser();
+    }
+
+    public void updateFavoriteButtons() {
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                return isFavorite();
+            }
+
+            @Override
+            protected void onPostExecute(Boolean isFavorite) {
+                if (isFavorite) {
+                    heartButton.setLiked(true);
+                } else {
+                    heartButton.setLiked(false);
+                }
+
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+
+        heartButton.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                markAsFavorite();
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                removeFromFavorites();
+            }
+        });
+
+
+    }
+
+    private boolean isFavorite() {
+        Cursor movieCursor = getContentResolver().query(
+                ArticleContract.ArticleEntry.CONTENT_URI,
+                new String[]{ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL},
+                ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL + " = " + "'" + article.getUrl() + "'",
+                null,
+                null);
+
+        if (movieCursor != null && movieCursor.moveToFirst()) {
+            movieCursor.close();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void markAsFavorite() {
+
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (!isFavorite()) {
+                    ContentValues articleValues = new ContentValues();
+                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_AUTHOR,
+                            article.getAuthor());
+                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_TITLE,
+                            article.getTitle());
+                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_DESCRIPTION,
+                            article.getDescription());
+                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL,
+                            article.getUrl());
+                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_IMAGE_URL,
+                            article.getUrlToImage());
+                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_TIME,
+                            article.getPublishedAt());
+                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_SOURCE,
+                            source);
+
+                    // Insert the content values via a ContentResolver
+                    Uri uri = getContentResolver().insert(
+                            ArticleContract.ArticleEntry.CONTENT_URI,
+                            articleValues
+                    );
+
+
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                updateFavoriteButtons();
+                Snackbar.make(parentView, "Article added to favorites!", Snackbar.LENGTH_LONG).show();
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+
+    public void removeFromFavorites() {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (isFavorite()) {
+                    getContentResolver().delete(ArticleContract.ArticleEntry.CONTENT_URI,
+                            ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL + " = " + "'" + article.getUrl() + "'", null);
+
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                updateFavoriteButtons();
+                Snackbar.make(parentView, "Article removed from favorites!", Snackbar.LENGTH_LONG).show();
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+
     private void setupChromeCustomTabs() {
-        mCustomTabsServiceConnection = new CustomTabsServiceConnection() {
-            @Override
-            public void onCustomTabsServiceConnected(ComponentName componentName, CustomTabsClient customTabsClient) {
-
-                //Pre-warming
-                mClient = customTabsClient;
-                mClient.warmup(0L);
-                //Initialize a session as soon as possible.
-                mCustomTabsSession = mClient.newSession(null);
-
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                mClient = null;
-            }
-        };
-
-        CustomTabsClient.bindCustomTabsService(DetailActivity.this, CUSTOM_TAB_PACKAGE_NAME, mCustomTabsServiceConnection);
-
-        customTabsIntent = new CustomTabsIntent.Builder(mCustomTabsSession)
+        customTabsIntent = new CustomTabsIntent.Builder()
                 .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setShowTitle(true)
                 .build();

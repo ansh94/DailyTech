@@ -11,6 +11,7 @@ public class Article implements Parcelable {
     private String url;
     private String urlToImage;
     private String publishedAt;
+    private String source;
 
 
     // Normal actions performed by class, since this is still a normal object!
@@ -28,7 +29,7 @@ public class Article implements Parcelable {
         url = in.readString();
         urlToImage = in.readString();
         publishedAt = in.readString();
-
+        source = in.readString();
     }
 
     @Override
@@ -85,6 +86,13 @@ public class Article implements Parcelable {
         this.publishedAt = publishedAt;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
 
     // This is where you write the values you want to save to the `Parcel`.
     // The `Parcel` class has methods defined to help you save all of your values.
@@ -98,6 +106,7 @@ public class Article implements Parcelable {
         parcel.writeString(url);
         parcel.writeString(urlToImage);
         parcel.writeString(publishedAt);
+        parcel.writeString(source);
     }
 
     // After implementing the `Parcelable` interface, we need to create the

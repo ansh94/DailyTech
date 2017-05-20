@@ -18,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     ArticlesAdapter adapter;
     LinearLayoutManager mLinearLayoutManager;
+
 
     public static final String BASE_URL = "https://newsapi.org/v1/";
     String apiKey = "f892e1eab66242a2bc5451c34ece3e55";
@@ -236,9 +238,22 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (drawerToggle.onOptionsItemSelected(item))
             return true;
+
+        int id = item.getItemId();
+        if (id == R.id.action_favorites) {
+            Intent favoritesIntent = new Intent(this, FavoriteMovieActivity.class);
+            startActivity(favoritesIntent);
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -334,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     public void onClick(Article article) {
         //read share preference and call
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        String restoredSubTitle = sharedPref.getString("SUBTITLE", null);
+        String restoredSubTitle = sharedPref.getString("SUBTITLE", "TechCrunch");
         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
         intent.putExtra("Article", article);
         intent.putExtra("Source", restoredSubTitle);

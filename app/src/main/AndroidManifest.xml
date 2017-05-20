@@ -2,7 +2,7 @@
 <manifest package="com.anshdeep.dailytech"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
@@ -27,6 +27,22 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.anshdeep.dailytech.MainActivity"/>
         </activity>
+
+        <activity
+            android:name=".FavoriteMovieActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.anshdeep.dailytech.MainActivity"/>
+        </activity>
+
+        <!-- Register the ArticleContentProvider -->
+        <!-- Set name, authorities, and exported attributes -->
+        <!-- exported = false limits access to this ContentProvider to only this app -->
+        <provider
+            android:name=".data.ArticleContentProvider"
+            android:authorities="com.anshdeep.dailytech"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

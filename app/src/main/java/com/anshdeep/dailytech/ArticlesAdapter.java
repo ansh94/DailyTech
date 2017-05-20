@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.anshdeep.dailytech.api.model.Article;
+import com.anshdeep.dailytech.util.CommonUtils;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
         holder.title.setText(listOfArticles.get(position).getTitle());
 
         //set time
-        holder.publishedTime.setText(Util.manipulateDateFormat(listOfArticles.get(position).getPublishedAt()));
+        holder.publishedTime.setText(CommonUtils.manipulateDateFormat(listOfArticles.get(position).getPublishedAt()));
 
 
     }
