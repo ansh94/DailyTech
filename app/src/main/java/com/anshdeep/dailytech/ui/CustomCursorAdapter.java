@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech;
+package com.anshdeep.dailytech.ui;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.anshdeep.dailytech.R;
 import com.anshdeep.dailytech.api.model.Article;
 import com.anshdeep.dailytech.data.ArticleContract;
 import com.anshdeep.dailytech.util.CommonUtils;
@@ -95,8 +96,6 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
             Glide.with(mContext)
                     .load(imageUrl)
                     .error(R.drawable.noimg)
-//                    .thumbnail(0.1f) // if you pass 0.1f as the parameter, Glide will display the original image reduced to 10% of the size. If the original image has 1000x1000 pixels, the thumbnail will have 100x100 pixels
-//                    .crossFade() //animation
                     .into(holder.thumbnail);
 
             //set news title

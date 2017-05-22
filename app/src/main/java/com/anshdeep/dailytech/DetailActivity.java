@@ -14,7 +14,6 @@ import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -27,6 +26,9 @@ import com.anshdeep.dailytech.data.ArticleContract;
 import com.anshdeep.dailytech.util.CommonUtils;
 import com.anshdeep.dailytech.widget.ArticleWidgetProvider;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
 
@@ -49,13 +51,12 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.root_view) View parentView;
 
 
-
     public static final String LOG_TAG = DetailActivity.class.getSimpleName();
-    public static final String ACTION_DATA_UPDATED = "com.anshdeep.dailytech.ACTION_DATA_UPDATED";
 
     private Article article;
     private String source;
     private LikeButton heartButton;
+    private AdView mAdView;
 
     // Chrome custom tab variables
     CustomTabsIntent customTabsIntent;
@@ -68,6 +69,13 @@ public class DetailActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        // Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713
+        MobileAds.initialize(this, getString(R.string.banner_ad_unit_id));
+
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
 
         Intent intent = getIntent();
 
@@ -76,18 +84,15 @@ public class DetailActivity extends AppCompatActivity {
 
         if (intent.hasExtra("Favorite")) {
             source = article.getSource();
-            Log.d(LOG_TAG, "source from favorites: " + source);
         }
 
 
         if (intent.hasExtra("Source")) {
             source = intent.getStringExtra("Source");
-            Log.d(LOG_TAG, "source : " + source);
         }
 
 
         heartButton = (LikeButton) findViewById(R.id.heart_button);
-        Log.d(LOG_TAG, "article title = " + article.getTitle());
         if (article != null) {
 
             updateFavoriteButtons();
@@ -111,17 +116,16 @@ public class DetailActivity extends AppCompatActivity {
 
             setupChromeCustomTabs();
 
-            btnOpenArticle.setText("Read full article on " + source);
+            btnOpenArticle.setText(getString(R.string.read_full_article) + " " + source);
             // button click handling
             btnOpenArticle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//
                     if (CommonUtils.checkConnection(DetailActivity.this)) {
                         // Launch Chrome Custom Tabs on click
                         customTabsIntent.launchUrl(DetailActivity.this, Uri.parse(article.getUrl()));
                     } else {
-                        Toast.makeText(DetailActivity.this, "Please turn on your internet connection to view full article!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(DetailActivity.this, R.string.internet_connection_msg, Toast.LENGTH_LONG).show();
                     }
 
 
@@ -166,10 +170,7 @@ public class DetailActivity extends AppCompatActivity {
                 } else {
                     heartButton.setLiked(false);
                 }
-//                Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
-//                DetailActivity.this.sendBroadcast(dataUpdatedIntent);
                 updateAllWidgets();
-                Log.d("DetailActivity", "Statement after intent ");
 
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -190,7 +191,7 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
-    private void updateAllWidgets(){
+    private void updateAllWidgets() {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, ArticleWidgetProvider.class));
         if (appWidgetIds.length > 0) {
@@ -244,7 +245,6 @@ public class DetailActivity extends AppCompatActivity {
                     );
 
 
-
                 }
                 return null;
             }
@@ -252,7 +252,7 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Void aVoid) {
                 updateFavoriteButtons();
-                Snackbar.make(parentView, "Article added to favorites!", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(parentView, R.string.article_added, Snackbar.LENGTH_LONG).show();
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
@@ -268,7 +268,6 @@ public class DetailActivity extends AppCompatActivity {
                             ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL + " = " + "'" + article.getUrl() + "'", null);
 
 
-
                 }
                 return null;
             }
@@ -276,7 +275,7 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Void aVoid) {
                 updateFavoriteButtons();
-                Snackbar.make(parentView, "Article removed from favorites!", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(parentView, R.string.article_removed, Snackbar.LENGTH_LONG).show();
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
@@ -289,6 +288,5 @@ public class DetailActivity extends AppCompatActivity {
                 .build();
 
     }
-
 
 }

@@ -46,7 +46,6 @@ public class ArticleWidgetProvider extends AppWidgetProvider {
             rv.setEmptyView(R.id.widget_list_new, R.id.widget_empty);
 
 
-
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list_new);
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, rv);
@@ -58,15 +57,6 @@ public class ArticleWidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
 
-
-//        if (DetailActivity.ACTION_DATA_UPDATED.equals(intent.getAction())) {
-//            Log.d("ArticleWidgetProvider", "onReceive called: ");
-//
-//            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-//            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
-//                    new ComponentName(context, getClass()));
-//            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list_new);
-//        }
 
     }
 

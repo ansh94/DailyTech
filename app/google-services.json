@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "759536652535",
+    "firebase_url": "https://dailytech-4352c.firebaseio.com",
+    "project_id": "dailytech-4352c",
+    "storage_bucket": "dailytech-4352c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:759536652535:android:542722e6a22362c8",
+        "android_client_info": {
+          "package_name": "com.anshdeep.dailytech"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "759536652535-2j9vce5k7ptg2gs3fen3aa8ckdckv4qr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anshdeep.dailytech",
+            "certificate_hash": "6be37e8f4bf3bd57255fbfb0d11fec22546e13e1"
+          }
+        },
+        {
+          "client_id": "759536652535-fs8c3knqv76tp1p9ak6ppsj9eu3nos7f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyChZrKJrNzCWGlhYRPRG93kn0B1f_uOI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "759536652535-fs8c3knqv76tp1p9ak6ppsj9eu3nos7f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

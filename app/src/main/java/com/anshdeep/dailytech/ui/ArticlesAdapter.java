@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech;
+package com.anshdeep.dailytech.ui;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,10 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.anshdeep.dailytech.R;
 import com.anshdeep.dailytech.api.model.Article;
 import com.anshdeep.dailytech.util.CommonUtils;
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -68,6 +70,10 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
     @Override
     public int getItemCount() {
         return listOfArticles.size();
+    }
+
+    public ArrayList<Article> getMovies() {
+        return (ArrayList<Article>) listOfArticles;
     }
 
     public void setDataAdapter(List<Article> newArticleList) {

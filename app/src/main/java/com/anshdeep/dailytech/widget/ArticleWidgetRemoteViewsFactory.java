@@ -79,7 +79,6 @@ public class ArticleWidgetRemoteViewsFactory implements RemoteViewsService.Remot
                 R.layout.widget_detail_list_item);
 
 
-
         int articleTitleIndex = data.getColumnIndex(ArticleContract.ArticleEntry.COLUMN_ARTICLE_TITLE);
         String articleTitle = data.getString(articleTitleIndex);
         views.setTextViewText(R.id.news_widget_title, articleTitle);

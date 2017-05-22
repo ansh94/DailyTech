@@ -5,35 +5,35 @@
         <item
             android:id="@+id/ars_technica"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="Ars Technica" />
+            android:title="@string/ars_technica" />
         <item
             android:id="@+id/engadget"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="Engadget" />
+            android:title="@string/engadget" />
         <item
             android:id="@+id/hacker_news"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="Hacker News" />
+            android:title="@string/hacker_news" />
         <item
             android:id="@+id/recode"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="Recode" />
+            android:title="@string/recode" />
         <item
             android:id="@+id/techcrunch"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="TechCrunch" />
+            android:title="@string/techcrunch" />
         <item
             android:id="@+id/techradar"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="TechRadar" />
+            android:title="@string/techradar" />
         <item
             android:id="@+id/the_next_web"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="The Next Web" />
+            android:title="@string/the_next_web" />
         <item
             android:id="@+id/the_verge"
             android:icon="@drawable/ic_label_black_24dp"
-            android:title="The Verge" />
+            android:title="@string/the_verge" />
     </group>
 
 </menu>

@@ -12,6 +12,6 @@ public class ArticleWidgetRemoteViewsService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         //return remote view factory here
-        return new ArticleWidgetRemoteViewsFactory(this,intent);
+        return new ArticleWidgetRemoteViewsFactory(this, intent);
     }
 }

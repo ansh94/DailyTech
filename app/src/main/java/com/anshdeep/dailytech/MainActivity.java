@@ -29,6 +29,8 @@ import android.widget.TextView;
 import com.anshdeep.dailytech.api.model.Article;
 import com.anshdeep.dailytech.api.model.NewsResponse;
 import com.anshdeep.dailytech.api.service.NewsArrayInterface;
+import com.anshdeep.dailytech.ui.ArticlesAdapter;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @BindView(R.id.drawer_layout) DrawerLayout mDrawer;
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.subtitle) TextView toolbarSubtitle;
-    @BindView(R.id.title) TextView toolbarTitle;
     @BindView(R.id.noData) LinearLayout noData;
     @BindView(R.id.no_Internet) LinearLayout noNet;
     @BindView(R.id.progress_bar) ProgressBar progressBar;
@@ -61,10 +62,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     ArticlesAdapter adapter;
     LinearLayoutManager mLinearLayoutManager;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+    private static final String EXTRA_ARTICLES = "EXTRA_ARTICLES";
 
 
     public static final String BASE_URL = "https://newsapi.org/v1/";
-    String apiKey = "f892e1eab66242a2bc5451c34ece3e55";
+    String apiKey = BuildConfig.NEWS_API_KEY;
     String retrofitUrlSourceName;
     List<Article> listOfArticles = new ArrayList<>();
 
@@ -81,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         ButterKnife.bind(this);
 
+
         // Adding toolbar to main screen
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(android.graphics.Color.WHITE);
@@ -90,27 +95,74 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mDrawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();  //IMPORTANT: without this hamburger icon will not come
 
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        //Sets whether analytics collection is enabled for this app on this device.
+        mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
+
+
         mLinearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLinearLayoutManager);
         adapter = new ArticlesAdapter(listOfArticles, this, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
 
+
         //set onRefreshListener on SwipeRefreshLayout
         mSwipeRefresh.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         mSwipeRefresh.setOnRefreshListener(this);
+
+        // Setup drawer view
+        setupDrawerContent(navigationView);
+
+        if (savedInstanceState != null) {
+            ArrayList<Article> articles = savedInstanceState.getParcelableArrayList(EXTRA_ARTICLES);
+            adapter.setDataAdapter(articles);
+
+            progressBar.setVisibility(View.INVISIBLE);
+            emptyView.setVisibility(View.INVISIBLE);
+            noData.setVisibility(View.INVISIBLE);
+            noNet.setVisibility(View.INVISIBLE);
+            mSwipeRefresh.setRefreshing(false);
+            flag = true; //restore flag to old state(i.e. true)
+        }
+
 
         //when refresh icon below No Data Found message is clicked
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Setup drawer view
-                setupDrawerContent(navigationView);
+                performLoading();
             }
         });
-        // Setup drawer view
-        setupDrawerContent(navigationView);
 
+    }
+
+    private void performLoading() {
+        emptyView.setVisibility(View.VISIBLE);
+        if (flag)
+            progressBar.setVisibility(View.VISIBLE);
+        noData.setVisibility(View.INVISIBLE);
+        noNet.setVisibility(View.INVISIBLE);
+
+        //check network connection
+        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+        if (isConnected) {
+
+            getRetrofitArray(retrofitUrlSourceName, apiKey);
+        } else {
+            emptyView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+            noData.setVisibility(View.INVISIBLE);
+            noNet.setVisibility(View.VISIBLE);
+            mSwipeRefresh.setRefreshing(false);
+            flag = true; //restore flag to old state(i.e. true)
+        }
     }
 
     // `onPostCreate` called when activity start-up is complete after `onStart()`
@@ -137,7 +189,43 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        selectDrawerItem(menuItem);
+                        // Handle navigation view item clicks here.
+                        int id = menuItem.getItemId();
+
+                        switch (id) {
+                            case R.id.ars_technica:
+                                performDrawerItemAction("Ars Technica", "ars-technica");
+                                break;
+                            case R.id.engadget:
+                                performDrawerItemAction("Engadget", "engadget");
+                                break;
+                            case R.id.hacker_news:
+                                performDrawerItemAction("Hacker News", "hacker-news");
+                                break;
+                            case R.id.recode:
+                                performDrawerItemAction("Recode", "recode");
+                                break;
+                            case R.id.techcrunch:
+                                performDrawerItemAction("TechCrunch", "techcrunch");
+                                break;
+                            case R.id.techradar:
+                                performDrawerItemAction("TechRadar", "techradar");
+                                break;
+                            case R.id.the_next_web:
+                                performDrawerItemAction("The Next Web", "the-next-web");
+                                break;
+                            case R.id.the_verge:
+                                performDrawerItemAction("The Verge", "the-verge");
+                                break;
+
+                        }
+
+                        // Highlight the selected item has been done by NavigationView
+                        menuItem.setChecked(true);
+
+                        // Close the navigation drawer
+                        mDrawer.closeDrawers();
+
                         return true;
                     }
                 }
@@ -148,56 +236,19 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         String restoredSubTitle = sharedPref.getString("SUBTITLE", null);
         String restoredRetrofitUrlSourceName = sharedPref.getString("URL_SOURCE_NAME", null);
         performDrawerItemAction(restoredSubTitle, restoredRetrofitUrlSourceName);
-    }
-
-    public void selectDrawerItem(MenuItem menuItem) {
-        // Handle navigation view item clicks here.
-        int id = menuItem.getItemId();
-
-        switch (id) {
-            case R.id.ars_technica:
-                performDrawerItemAction("Ars Technica", "ars-technica");
-                break;
-            case R.id.engadget:
-                performDrawerItemAction("Engadget", "engadget");
-                break;
-            case R.id.hacker_news:
-                performDrawerItemAction("Hacker News", "hacker-news");
-                break;
-            case R.id.recode:
-                performDrawerItemAction("Recode", "recode");
-                break;
-            case R.id.techcrunch:
-                performDrawerItemAction("TechCrunch", "techcrunch");
-                break;
-            case R.id.techradar:
-                performDrawerItemAction("TechRadar", "techradar");
-                break;
-            case R.id.the_next_web:
-                performDrawerItemAction("The Next Web", "the-next-web");
-                break;
-            case R.id.the_verge:
-                performDrawerItemAction("The Verge", "the-verge");
-                break;
-
-        }
-
-
-        // Highlight the selected item has been done by NavigationView
-        menuItem.setChecked(true);
-
-        // Close the navigation drawer
-        mDrawer.closeDrawers();
+        performLoading();
     }
 
 
     private void performDrawerItemAction(String sourceName, String urlSourceName) {
 
         if (sourceName == null) {
-            toolbarSubtitle.setText("TechCrunch");
+            toolbarSubtitle.setText(" " + R.string.techcrunch);
             retrofitUrlSourceName = "techcrunch";
         } else {
-            toolbarSubtitle.setText(sourceName);
+
+
+            toolbarSubtitle.setText(" " + sourceName);
 
             SharedPreferences.Editor sharedPref = this.getPreferences(Context.MODE_PRIVATE).edit();
             sharedPref.putString("SUBTITLE", sourceName);
@@ -207,28 +258,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             retrofitUrlSourceName = urlSourceName;
         }
 
-        emptyView.setVisibility(View.VISIBLE);
-        if (flag)
-            progressBar.setVisibility(View.VISIBLE);
-        noData.setVisibility(View.INVISIBLE);
-        noNet.setVisibility(View.INVISIBLE);
 
-        //check network connection
-        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        performLoading();
 
-        if (isConnected)
-            getRetrofitArray(retrofitUrlSourceName, apiKey);
-
-        else {
-            emptyView.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.INVISIBLE);
-            noData.setVisibility(View.INVISIBLE);
-            noNet.setVisibility(View.VISIBLE);
-            mSwipeRefresh.setRefreshing(false);
-            flag = true; //restore flag to old state(i.e. true)
-        }
     }
 
 
@@ -262,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     public void onRefresh() {
         flag = false;
-        setupDrawerContent(navigationView);
+        performLoading();
 
     }
 
@@ -308,17 +340,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 appBar.setExpanded(true, true); //unhide app bar when new new source is chosen
                 mLinearLayoutManager.scrollToPositionWithOffset(0, 0);//scroll to top of recycler view
                 listOfArticles = response.body().getArticles();
-//                for (Article article : listOfArticles) {
-//                    Log.d("MainActivity", "article author: " + article.getAuthor());
-//                    article.setAuthor(article.getAuthor());
-//                    article.setTitle(article.getTitle());
-//                    article.setDescription(article.getDescription());
-//                    article.setUrl(article.getUrl());
-//                    article.setPublishedAt(article.getPublishedAt());
-//                    article.setUrlToImage(article.getUrlToImage());
-//
-//                }
-
 
 
                 adapter.setDataAdapter(listOfArticles);
@@ -349,6 +370,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     }
 
+
     @Override
     public void onClick(Article article) {
         //read share preference and call
@@ -359,4 +381,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         intent.putExtra("Source", restoredSubTitle);
         startActivity(intent);
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        ArrayList<Article> articles = adapter.getMovies();
+        if (articles != null && !articles.isEmpty()) {
+            outState.putParcelableArrayList(EXTRA_ARTICLES, articles);
+        }
+
+    }
+
 }

@@ -18,7 +18,7 @@ import static com.anshdeep.dailytech.data.ArticleContract.ArticleEntry.TABLE_NAM
 
 public class ArticleContentProvider extends ContentProvider {
 
-    // Define final integer constants for the directory of tasks and a single item.
+    // Define final integer constants for the directory of articles and a single item.
     // It's convention to use 100, 200, 300, etc for directories,
     // and related ints (101, 102, ..) for items in that directory.
     public static final int ARTICLES = 100;
@@ -49,7 +49,7 @@ public class ArticleContentProvider extends ContentProvider {
         return uriMatcher;
     }
 
-    // Member variable for a TaskDbHelper that's initialized in the onCreate() method
+    // Member variable for a ArticleDbHelper that's initialized in the onCreate() method
     private ArticleDBHelper mArticleDBHelper;
 
     /* onCreate() is where you should initialize anything you’ll need to setup
@@ -59,7 +59,7 @@ public class ArticleContentProvider extends ContentProvider {
      */
     @Override
     public boolean onCreate() {
-        // Complete onCreate() and initialize a TaskDbhelper on startup
+        // Complete onCreate() and initialize a ArticleDbhelper on startup
 
         Context context = getContext();
         mArticleDBHelper = new ArticleDBHelper(context);

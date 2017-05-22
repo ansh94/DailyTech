@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.anshdeep.dailytech.api.model.Article;
 import com.anshdeep.dailytech.data.ArticleContract;
+import com.anshdeep.dailytech.ui.CustomCursorAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,18 +29,11 @@ public class FavoriteMovieActivity extends AppCompatActivity implements CustomCu
 
 
     @BindView(R.id.toolbar_favorite) Toolbar toolbar;
-//    @BindView(R.id.subtitle_favorite) TextView toolbarSubtitle;
-//    @BindView(R.id.title_favorite) TextView toolbarTitle;
-//    @BindView(R.id.empty_view) View emptyView;
-
-
     @BindView(R.id.recyclerView_favorite) RecyclerView recyclerView;
     @BindView(R.id.appBar_favorite) AppBarLayout appBar;
 
 
     LinearLayoutManager mLinearLayoutManager;
-
-    public static final String LOG_TAG = FavoriteMovieActivity.class.getSimpleName();
 
     private static final int ARTICLE_LOADER_ID = 0;
 
@@ -57,7 +51,7 @@ public class FavoriteMovieActivity extends AppCompatActivity implements CustomCu
         // Adding toolbar to main screen
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(android.graphics.Color.WHITE);
-        getSupportActionBar().setTitle("Daily Tech - My Favorite Articles");
+        getSupportActionBar().setTitle(R.string.my_favorite_title);
 
 
         cAdapter = new CustomCursorAdapter(this, this);
@@ -165,7 +159,6 @@ public class FavoriteMovieActivity extends AppCompatActivity implements CustomCu
 
     @Override
     public void onFavoriteArticleClick(Article article) {
-//        Toast.makeText(this, "Favorite movie clicked", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(FavoriteMovieActivity.this, DetailActivity.class);
         intent.putExtra("Article", article);
         intent.putExtra("Favorite", favorite);

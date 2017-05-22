@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/action_favorites"
-        android:title="Favorites"
+        android:title="@string/favorites"
         android:icon="@drawable/ic_star_black_24dp"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"/>
