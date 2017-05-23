@@ -109,7 +109,7 @@ public class DetailActivity extends AppCompatActivity {
             newsTitle.setText(article.getTitle());
 
             // set author
-            newsAuthor.setText("By " + article.getAuthor());
+            newsAuthor.setText(getString(R.string.by) +  " " +  article.getAuthor());
 
             // set title
             newsDescription.setText(article.getDescription());
