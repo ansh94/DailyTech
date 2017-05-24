@@ -26,9 +26,6 @@ import com.anshdeep.dailytech.data.ArticleContract;
 import com.anshdeep.dailytech.util.CommonUtils;
 import com.anshdeep.dailytech.widget.ArticleWidgetProvider;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
 
@@ -56,7 +53,6 @@ public class DetailActivity extends AppCompatActivity {
     private Article article;
     private String source;
     private LikeButton heartButton;
-    private AdView mAdView;
 
     // Chrome custom tab variables
     CustomTabsIntent customTabsIntent;
@@ -68,13 +64,6 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         ButterKnife.bind(this);
-
-        // Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713
-        MobileAds.initialize(this, getString(R.string.banner_ad_unit_id));
-
-        mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
 
         Intent intent = getIntent();
@@ -109,7 +98,7 @@ public class DetailActivity extends AppCompatActivity {
             newsTitle.setText(article.getTitle());
 
             // set author
-            newsAuthor.setText(getString(R.string.by) +  " " +  article.getAuthor());
+            newsAuthor.setText(getString(R.string.by) + " " + article.getAuthor());
 
             // set title
             newsDescription.setText(article.getDescription());

@@ -22,7 +22,7 @@
                 android:id="@+id/news_image_detail"
                 android:layout_width="match_parent"
                 android:contentDescription="@string/article_image"
-                android:layout_height="200dp"
+                android:layout_height="260dp"
                 android:scaleType="centerCrop"/>
 
             <android.support.v7.widget.Toolbar
@@ -126,8 +126,6 @@
                 android:lineSpacingExtra="5dp"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
-                android:maxLines="3"
-                android:ellipsize="end"
                 tools:text="@string/sample_overview"/>
 
 
@@ -147,15 +145,6 @@
                 android:layout_marginTop="8dp"
                 android:background="@android:color/darker_gray"/>
 
-            <com.google.android.gms.ads.AdView
-                android:layout_marginTop="10dp"
-                android:id="@+id/adView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                ads:adSize="BANNER"
-                ads:adUnitId="@string/banner_ad_unit_id">
-            </com.google.android.gms.ads.AdView>
 
         </LinearLayout>
 

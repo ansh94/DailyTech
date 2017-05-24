@@ -69,8 +69,5 @@ dependencies {
     // Firebase analytics
     compile 'com.google.firebase:firebase-core:10.2.6'
 
-    // Firebase Admob
-    compile 'com.google.firebase:firebase-ads:10.2.6'
-
 }
 apply plugin: 'com.google.gms.google-services'
