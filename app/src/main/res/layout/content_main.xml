@@ -17,64 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-        <View
-            android:id="@+id/empty_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#FFFFFF"
-            android:visibility="invisible"/>
-
-        <LinearLayout
-            android:id="@+id/noData"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="invisible">
-
-            <ImageView
-                android:contentDescription="@string/no_data"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/no_data"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/no_news_found"
-                android:textSize="20sp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/no_Internet"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="invisible">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/no_internet"
-                android:scaleType="centerCrop"
-                android:src="@drawable/no_data"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/no_internet_text"
-                android:textSize="16sp"/>
-
-            <ImageView
-                android:id="@+id/refresh"
-                android:contentDescription="@string/refresh"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/ic_refresh_black_24dp"/>
-        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progress_bar"

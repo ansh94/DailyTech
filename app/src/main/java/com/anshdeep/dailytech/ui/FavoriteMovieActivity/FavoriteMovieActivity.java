@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech;
+package com.anshdeep.dailytech.ui.FavoriteMovieActivity;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,9 +13,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
+import com.anshdeep.dailytech.R;
 import com.anshdeep.dailytech.api.model.Article;
 import com.anshdeep.dailytech.data.ArticleContract;
 import com.anshdeep.dailytech.ui.CustomCursorAdapter;
+import com.anshdeep.dailytech.ui.DetailActivity.DetailActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

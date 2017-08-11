@@ -1,11 +1,9 @@
-package com.anshdeep.dailytech;
+package com.anshdeep.dailytech.ui.ArticlesActivity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
@@ -17,63 +15,55 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.anshdeep.dailytech.BuildConfig;
+import com.anshdeep.dailytech.DailyTechApp;
+import com.anshdeep.dailytech.R;
 import com.anshdeep.dailytech.api.model.Article;
-import com.anshdeep.dailytech.api.model.NewsResponse;
-import com.anshdeep.dailytech.api.service.NewsArrayInterface;
-import com.anshdeep.dailytech.ui.ArticlesAdapter;
-import com.google.firebase.analytics.FirebaseAnalytics;
+import com.anshdeep.dailytech.ui.DetailActivity.DetailActivity;
+import com.anshdeep.dailytech.ui.FavoriteMovieActivity.FavoriteMovieActivity;
+import com.anshdeep.dailytech.util.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, ArticlesAdapter.ArticlesAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity implements MainView,SwipeRefreshLayout.OnRefreshListener, ArticlesAdapter.ArticlesAdapterOnClickHandler{
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout mDrawer;
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.subtitle) TextView toolbarSubtitle;
-    @BindView(R.id.noData) LinearLayout noData;
-    @BindView(R.id.no_Internet) LinearLayout noNet;
     @BindView(R.id.progress_bar) ProgressBar progressBar;
-    @BindView(R.id.empty_view) View emptyView;
-    @BindView(R.id.refresh) ImageView refresh;
     @BindView(R.id.swipeRefresh) SwipeRefreshLayout mSwipeRefresh;
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.appBar) AppBarLayout appBar;
 
+    @Inject
+    MainPresenter presenter;
+
     ArticlesAdapter adapter;
     LinearLayoutManager mLinearLayoutManager;
 
-    private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final String EXTRA_ARTICLES = "EXTRA_ARTICLES";
 
 
-    public static final String BASE_URL = "https://newsapi.org/v1/";
     String apiKey = BuildConfig.NEWS_API_KEY;
     String retrofitUrlSourceName;
     List<Article> listOfArticles = new ArrayList<>();
 
-    // Make sure to be using android.support.v7.app.ActionBarDrawerToggle version.
-    // The android.support.v4.app.ActionBarDrawerToggle has been deprecated.
     private ActionBarDrawerToggle drawerToggle;
 
     boolean flag = true; //flag to hide progress bar when swipe refresh is triggered
@@ -82,9 +72,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ((DailyTechApp) getApplication()).getAppComponent().inject(MainActivity.this);
 
         ButterKnife.bind(this);
 
+        presenter.setView(this);
 
         // Adding toolbar to main screen
         setSupportActionBar(toolbar);
@@ -94,12 +86,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         drawerToggle = setupDrawerToggle();
         mDrawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();  //IMPORTANT: without this hamburger icon will not come
-
-        // Obtain the FirebaseAnalytics instance.
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
-        //Sets whether analytics collection is enabled for this app on this device.
-        mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
 
 
         mLinearLayoutManager = new LinearLayoutManager(this);
@@ -119,48 +105,28 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         if (savedInstanceState != null) {
             ArrayList<Article> articles = savedInstanceState.getParcelableArrayList(EXTRA_ARTICLES);
             adapter.setDataAdapter(articles);
-
-            progressBar.setVisibility(View.INVISIBLE);
-            emptyView.setVisibility(View.INVISIBLE);
-            noData.setVisibility(View.INVISIBLE);
-            noNet.setVisibility(View.INVISIBLE);
-            mSwipeRefresh.setRefreshing(false);
+            hideLoading();
+            swipeToRefresh(false);
             flag = true; //restore flag to old state(i.e. true)
         }
-
-
-        //when refresh icon below No Data Found message is clicked
-        refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Setup drawer view
-                performLoading();
-            }
-        });
 
     }
 
     private void performLoading() {
-        emptyView.setVisibility(View.VISIBLE);
-        if (flag)
-            progressBar.setVisibility(View.VISIBLE);
-        noData.setVisibility(View.INVISIBLE);
-        noNet.setVisibility(View.INVISIBLE);
+        if (flag) {
+            showLoading();
+        }
 
-        //check network connection
-        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-        if (isConnected) {
-
-            getRetrofitArray(retrofitUrlSourceName, apiKey);
+        if (NetworkUtils.checkConnection(this)) {
+            presenter.getArticles(retrofitUrlSourceName, apiKey);
+            flag = true;
+        } else if (!NetworkUtils.checkConnection(this)) {
+            showErrorMessage("Please check your internet connection!");
+            hideLoading();
+            swipeToRefresh(false);
         } else {
-            emptyView.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.INVISIBLE);
-            noData.setVisibility(View.INVISIBLE);
-            noNet.setVisibility(View.VISIBLE);
-            mSwipeRefresh.setRefreshing(false);
+            hideLoading();
+            swipeToRefresh(false);
             flag = true; //restore flag to old state(i.e. true)
         }
     }
@@ -236,7 +202,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         String restoredSubTitle = sharedPref.getString("SUBTITLE", null);
         String restoredRetrofitUrlSourceName = sharedPref.getString("URL_SOURCE_NAME", null);
         performDrawerItemAction(restoredSubTitle, restoredRetrofitUrlSourceName);
-        performLoading();
     }
 
 
@@ -245,9 +210,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         if (sourceName == null) {
             toolbarSubtitle.setText(" " + R.string.techcrunch);
             retrofitUrlSourceName = "techcrunch";
-        } else {
-
-
+        } else if (!toolbarSubtitle.getText().equals(" " + sourceName)) {
             toolbarSubtitle.setText(" " + sourceName);
 
             SharedPreferences.Editor sharedPref = this.getPreferences(Context.MODE_PRIVATE).edit();
@@ -256,10 +219,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             sharedPref.commit();
 
             retrofitUrlSourceName = urlSourceName;
+            performLoading();
+
         }
-
-
-        performLoading();
 
     }
 
@@ -298,69 +260,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     }
 
-    void getRetrofitArray(String newsSource, String apiKey) {
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        NewsArrayInterface serviceRequest = retrofit.create(NewsArrayInterface.class);
-
-        Call<NewsResponse> call = serviceRequest.getArticles(newsSource, apiKey);
-
-        /*
-          enqueue() asynchronously sends the request and notifies your app with a callback when a response comes back.
-          Since this request is asynchronous, Retrofit handles it on a background thread so that the main UI thread
-          isn't blocked or interfered with.
-         */
-        call.enqueue(new Callback<NewsResponse>() {
-
-            /*
-            onResponse(): invoked for a received HTTP response. This method is called for a response that can be correctly
-            handled even if the server returns an error message. So if you get a status code of 404 or 500, this method will
-            still be called. To get the status code in order for you to handle situations based on them, you can use the
-            method response.code().You can also use the isSuccessful() method to find out if the status code is in
-            the range 200-300, indicating success.
-             */
-
-            @Override
-            public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
-
-                int statusCode = response.code();
-
-                if (statusCode != 200) {
-                    emptyView.setVisibility(View.INVISIBLE);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    noData.setVisibility(View.VISIBLE);
-                    noNet.setVisibility(View.INVISIBLE);
-                    return;
-                }
-
-                appBar.setExpanded(true, true); //unhide app bar when new new source is chosen
-                mLinearLayoutManager.scrollToPositionWithOffset(0, 0);//scroll to top of recycler view
-                listOfArticles = response.body().getArticles();
-
-
-                adapter.setDataAdapter(listOfArticles);
-                adapter.notifyDataSetChanged();
-
-                progressBar.setVisibility(View.INVISIBLE);
-                emptyView.setVisibility(View.INVISIBLE);
-                noData.setVisibility(View.INVISIBLE);
-                noNet.setVisibility(View.INVISIBLE);
-                mSwipeRefresh.setRefreshing(false);
-                flag = true; //restore flag to old state(i.e. true)
-            }
-
-            @Override
-            public void onFailure(Call<NewsResponse> call, Throwable t) {
-                Log.d("onFailure", t.toString());
-            }
-
-        });
-    }
-
     @Override
     public void onBackPressed() {  //when back pressed check drawer is open or not
         if (mDrawer.isDrawerOpen(GravityCompat.START)) {
@@ -385,7 +284,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         ArrayList<Article> articles = adapter.getMovies();
         if (articles != null && !articles.isEmpty()) {
             outState.putParcelableArrayList(EXTRA_ARTICLES, articles);
@@ -393,4 +291,29 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     }
 
+    @Override
+    public void showLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoading() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void swipeToRefresh(boolean refreshingStatus) {
+        mSwipeRefresh.setRefreshing(refreshingStatus);
+    }
+
+    @Override
+    public void showArticles(List<Article> articleList) {
+        adapter.setDataAdapter(articleList);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showErrorMessage(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+    }
 }

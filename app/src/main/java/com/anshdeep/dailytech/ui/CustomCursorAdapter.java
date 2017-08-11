@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.anshdeep.dailytech.R;
 import com.anshdeep.dailytech.api.model.Article;
 import com.anshdeep.dailytech.data.ArticleContract;
-import com.anshdeep.dailytech.util.CommonUtils;
+import com.anshdeep.dailytech.util.DateUtil;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -102,7 +102,7 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
             holder.title.setText(title);
 
             //set time
-            holder.publishedTime.setText(CommonUtils.manipulateDateFormat(publishTime));
+            holder.publishedTime.setText(DateUtil.manipulateDateFormat(publishTime));
         }
     }
 

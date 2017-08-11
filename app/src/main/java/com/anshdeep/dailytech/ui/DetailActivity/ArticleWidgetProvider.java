@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech.widget;
+package com.anshdeep.dailytech.ui.DetailActivity;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -10,9 +10,8 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.anshdeep.dailytech.DetailActivity;
-import com.anshdeep.dailytech.FavoriteMovieActivity;
 import com.anshdeep.dailytech.R;
+import com.anshdeep.dailytech.ui.FavoriteMovieActivity.FavoriteMovieActivity;
 
 /**
  * Created by ANSHDEEP on 20-05-2017.

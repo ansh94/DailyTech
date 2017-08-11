@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech.ui;
+package com.anshdeep.dailytech.ui.ArticlesActivity;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.anshdeep.dailytech.R;
 import com.anshdeep.dailytech.api.model.Article;
-import com.anshdeep.dailytech.util.CommonUtils;
+import com.anshdeep.dailytech.util.DateUtil;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.Articl
         holder.title.setText(listOfArticles.get(position).getTitle());
 
         //set time
-        holder.publishedTime.setText(CommonUtils.manipulateDateFormat(listOfArticles.get(position).getPublishedAt()));
+        holder.publishedTime.setText(DateUtil.manipulateDateFormat(listOfArticles.get(position).getPublishedAt()));
 
 
     }

@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech;
+package com.anshdeep.dailytech.ui.DetailActivity;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -21,10 +21,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.anshdeep.dailytech.R;
 import com.anshdeep.dailytech.api.model.Article;
 import com.anshdeep.dailytech.data.ArticleContract;
-import com.anshdeep.dailytech.util.CommonUtils;
-import com.anshdeep.dailytech.widget.ArticleWidgetProvider;
+import com.anshdeep.dailytech.util.NetworkUtils;
 import com.bumptech.glide.Glide;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
@@ -110,7 +110,7 @@ public class DetailActivity extends AppCompatActivity {
             btnOpenArticle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (CommonUtils.checkConnection(DetailActivity.this)) {
+                    if (NetworkUtils.checkConnection(DetailActivity.this)) {
                         // Launch Chrome Custom Tabs on click
                         customTabsIntent.launchUrl(DetailActivity.this, Uri.parse(article.getUrl()));
                     } else {

@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
+        android:name=".DailyTechApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -13,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.ArticlesActivity.MainActivity"
             android:configChanges="orientation|screenSize">>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -23,18 +24,18 @@
         </activity>
 
         <activity
-            android:name=".DetailActivity">
+            android:name=".ui.DetailActivity.DetailActivity">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.anshdeep.dailytech.MainActivity"/>
+                android:value="com.anshdeep.dailytech.ui.ArticlesActivity.MainActivity"/>
         </activity>
 
         <activity
-            android:name=".FavoriteMovieActivity">
+            android:name=".ui.FavoriteMovieActivity.FavoriteMovieActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.anshdeep.dailytech.MainActivity"/>
+                android:value="com.anshdeep.dailytech.ui.ArticlesActivity.MainActivity"/>
         </activity>
 
         <!-- Register the ArticleContentProvider -->
@@ -51,7 +52,7 @@
         <!-- 1. The broadcast receiver that refers to our widget. This needs the
                 intent-filter android.appwidget.action.APPWIDGET_UPDATE and the
                 meta-data for our XML widget configuration -->
-        <receiver android:name=".widget.ArticleWidgetProvider">
+        <receiver android:name=".ui.widget.ArticleWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -64,7 +65,7 @@
         <!-- 2. The service that will send our collection data to our widget. It needs the
                 permission android.permission.BIND_REMOTEVIEWS -->
         <service
-            android:name=".widget.ArticleWidgetRemoteViewsService"
+            android:name=".ui.widget.ArticleWidgetRemoteViewsService"
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
