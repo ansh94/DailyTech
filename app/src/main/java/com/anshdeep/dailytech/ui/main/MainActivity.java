@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech.ui.ArticlesActivity;
+package com.anshdeep.dailytech.ui.main;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,23 +11,20 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.anshdeep.dailytech.BuildConfig;
-import com.anshdeep.dailytech.DailyTechApp;
 import com.anshdeep.dailytech.R;
 import com.anshdeep.dailytech.api.model.Article;
-import com.anshdeep.dailytech.ui.DetailActivity.DetailActivity;
-import com.anshdeep.dailytech.ui.FavoriteMovieActivity.FavoriteMovieActivity;
+import com.anshdeep.dailytech.ui.base.BaseActivity;
+import com.anshdeep.dailytech.ui.detail.DetailActivity;
+import com.anshdeep.dailytech.ui.favorite.FavoriteMovieActivity;
 import com.anshdeep.dailytech.util.NetworkUtils;
 
 import java.util.ArrayList;
@@ -38,27 +35,32 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements MainView,SwipeRefreshLayout.OnRefreshListener, ArticlesAdapter.ArticlesAdapterOnClickHandler{
+public class MainActivity extends BaseActivity implements MainView, SwipeRefreshLayout.OnRefreshListener, ArticlesAdapter.ArticlesAdapterOnClickHandler {
+
+
+    @Inject
+    MainPresenter mPresenter;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
+
     @BindView(R.id.drawer_layout) DrawerLayout mDrawer;
+
     @BindView(R.id.nav_view) NavigationView navigationView;
+
     @BindView(R.id.subtitle) TextView toolbarSubtitle;
+
     @BindView(R.id.progress_bar) ProgressBar progressBar;
+
     @BindView(R.id.swipeRefresh) SwipeRefreshLayout mSwipeRefresh;
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.appBar) AppBarLayout appBar;
 
-    @Inject
-    MainPresenter presenter;
+    @BindView(R.id.appBar) AppBarLayout appBar;
 
     ArticlesAdapter adapter;
     LinearLayoutManager mLinearLayoutManager;
 
-
     private static final String EXTRA_ARTICLES = "EXTRA_ARTICLES";
-
 
     String apiKey = BuildConfig.NEWS_API_KEY;
     String retrofitUrlSourceName;
@@ -72,35 +74,14 @@ public class MainActivity extends AppCompatActivity implements MainView,SwipeRef
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ((DailyTechApp) getApplication()).getAppComponent().inject(MainActivity.this);
 
-        ButterKnife.bind(this);
+        getActivityComponent().inject(this);
 
-        presenter.setView(this);
+        setUnBinder(ButterKnife.bind(this));
 
-        // Adding toolbar to main screen
-        setSupportActionBar(toolbar);
-        toolbar.setTitleTextColor(android.graphics.Color.WHITE);
+        mPresenter.onAttach(MainActivity.this);
 
-        // Tie DrawerLayout events to the ActionBarToggle
-        drawerToggle = setupDrawerToggle();
-        mDrawer.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();  //IMPORTANT: without this hamburger icon will not come
-
-
-        mLinearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(mLinearLayoutManager);
-        adapter = new ArticlesAdapter(listOfArticles, this, this);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setHasFixedSize(true);
-
-
-        //set onRefreshListener on SwipeRefreshLayout
-        mSwipeRefresh.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
-        mSwipeRefresh.setOnRefreshListener(this);
-
-        // Setup drawer view
-        setupDrawerContent(navigationView);
+        setUp();
 
         if (savedInstanceState != null) {
             ArrayList<Article> articles = savedInstanceState.getParcelableArrayList(EXTRA_ARTICLES);
@@ -112,16 +93,17 @@ public class MainActivity extends AppCompatActivity implements MainView,SwipeRef
 
     }
 
+    //should move this method in presenter
     private void performLoading() {
         if (flag) {
             showLoading();
         }
 
         if (NetworkUtils.checkConnection(this)) {
-            presenter.getArticles(retrofitUrlSourceName, apiKey);
+            mPresenter.getArticles(retrofitUrlSourceName, apiKey);
             flag = true;
         } else if (!NetworkUtils.checkConnection(this)) {
-            showErrorMessage("Please check your internet connection!");
+            showMessage("Please check your internet connection!");
             hideLoading();
             swipeToRefresh(false);
         } else {
@@ -147,61 +129,6 @@ public class MainActivity extends AppCompatActivity implements MainView,SwipeRef
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggles
         drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    private void setupDrawerContent(NavigationView navigationView) {
-
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // Handle navigation view item clicks here.
-                        int id = menuItem.getItemId();
-
-                        switch (id) {
-                            case R.id.ars_technica:
-                                performDrawerItemAction("Ars Technica", "ars-technica");
-                                break;
-                            case R.id.engadget:
-                                performDrawerItemAction("Engadget", "engadget");
-                                break;
-                            case R.id.hacker_news:
-                                performDrawerItemAction("Hacker News", "hacker-news");
-                                break;
-                            case R.id.recode:
-                                performDrawerItemAction("Recode", "recode");
-                                break;
-                            case R.id.techcrunch:
-                                performDrawerItemAction("TechCrunch", "techcrunch");
-                                break;
-                            case R.id.techradar:
-                                performDrawerItemAction("TechRadar", "techradar");
-                                break;
-                            case R.id.the_next_web:
-                                performDrawerItemAction("The Next Web", "the-next-web");
-                                break;
-                            case R.id.the_verge:
-                                performDrawerItemAction("The Verge", "the-verge");
-                                break;
-
-                        }
-
-                        // Highlight the selected item has been done by NavigationView
-                        menuItem.setChecked(true);
-
-                        // Close the navigation drawer
-                        mDrawer.closeDrawers();
-
-                        return true;
-                    }
-                }
-        );
-
-        //read share preference and call
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        String restoredSubTitle = sharedPref.getString("SUBTITLE", null);
-        String restoredRetrofitUrlSourceName = sharedPref.getString("URL_SOURCE_NAME", null);
-        performDrawerItemAction(restoredSubTitle, restoredRetrofitUrlSourceName);
     }
 
 
@@ -291,14 +218,87 @@ public class MainActivity extends AppCompatActivity implements MainView,SwipeRef
 
     }
 
-    @Override
-    public void showLoading() {
-        progressBar.setVisibility(View.VISIBLE);
+    void setUpNavMenu() {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // Handle navigation view item clicks here.
+                        int id = menuItem.getItemId();
+
+                        switch (id) {
+                            case R.id.ars_technica:
+                                performDrawerItemAction("Ars Technica", "ars-technica");
+                                break;
+                            case R.id.engadget:
+                                performDrawerItemAction("Engadget", "engadget");
+                                break;
+                            case R.id.hacker_news:
+                                performDrawerItemAction("Hacker News", "hacker-news");
+                                break;
+                            case R.id.recode:
+                                performDrawerItemAction("Recode", "recode");
+                                break;
+                            case R.id.techcrunch:
+                                performDrawerItemAction("TechCrunch", "techcrunch");
+                                break;
+                            case R.id.techradar:
+                                performDrawerItemAction("TechRadar", "techradar");
+                                break;
+                            case R.id.the_next_web:
+                                performDrawerItemAction("The Next Web", "the-next-web");
+                                break;
+                            case R.id.the_verge:
+                                performDrawerItemAction("The Verge", "the-verge");
+                                break;
+
+                        }
+
+                        // Highlight the selected item has been done by NavigationView
+                        menuItem.setChecked(true);
+
+                        // Close the navigation drawer
+                        mDrawer.closeDrawers();
+
+                        return true;
+                    }
+                }
+        );
+
+        //read share preference and call
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        String restoredSubTitle = sharedPref.getString("SUBTITLE", null);
+        String restoredRetrofitUrlSourceName = sharedPref.getString("URL_SOURCE_NAME", null);
+        performDrawerItemAction(restoredSubTitle, restoredRetrofitUrlSourceName);
     }
 
+
     @Override
-    public void hideLoading() {
-        progressBar.setVisibility(View.GONE);
+    protected void setUp() {
+        // Adding toolbar to main screen
+        setSupportActionBar(toolbar);
+        toolbar.setTitleTextColor(android.graphics.Color.WHITE);
+
+        // Tie DrawerLayout events to the ActionBarToggle
+        drawerToggle = setupDrawerToggle();
+        mDrawer.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();  //IMPORTANT: without this hamburger icon will not come
+
+        setUpNavMenu();
+        setUpRecyclerView();
+
+        //set onRefreshListener on SwipeRefreshLayout
+        mSwipeRefresh.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        mSwipeRefresh.setOnRefreshListener(this);
+    }
+
+    private void setUpRecyclerView() {
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mLinearLayoutManager);
+        adapter = new ArticlesAdapter(listOfArticles, this, this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setHasFixedSize(true);
+
     }
 
     @Override
@@ -312,8 +312,4 @@ public class MainActivity extends AppCompatActivity implements MainView,SwipeRef
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void showErrorMessage(String error) {
-        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
-    }
 }

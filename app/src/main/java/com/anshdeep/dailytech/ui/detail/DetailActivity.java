@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech.ui.DetailActivity;
+package com.anshdeep.dailytech.ui.detail;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;

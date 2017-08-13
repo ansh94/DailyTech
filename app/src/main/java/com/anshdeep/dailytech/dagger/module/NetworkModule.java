@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech.dagger;
+package com.anshdeep.dailytech.dagger.module;
 
 import com.anshdeep.dailytech.network.NewsApiInterface;
 import com.anshdeep.dailytech.util.Constants;

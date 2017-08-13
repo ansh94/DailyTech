@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech.ui.FavoriteMovieActivity;
+package com.anshdeep.dailytech.ui.favorite;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,7 +17,7 @@ import com.anshdeep.dailytech.R;
 import com.anshdeep.dailytech.api.model.Article;
 import com.anshdeep.dailytech.data.ArticleContract;
 import com.anshdeep.dailytech.ui.CustomCursorAdapter;
-import com.anshdeep.dailytech.ui.DetailActivity.DetailActivity;
+import com.anshdeep.dailytech.ui.detail.DetailActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

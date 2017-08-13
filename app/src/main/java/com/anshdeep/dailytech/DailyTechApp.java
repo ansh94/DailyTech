@@ -1,10 +1,11 @@
 package com.anshdeep.dailytech;
 
 import android.app.Application;
+import android.content.Context;
 
-import com.anshdeep.dailytech.dagger.AppComponent;
-import com.anshdeep.dailytech.dagger.AppModule;
-import com.anshdeep.dailytech.dagger.DaggerAppComponent;
+import com.anshdeep.dailytech.dagger.component.ApplicationComponent;
+import com.anshdeep.dailytech.dagger.component.DaggerApplicationComponent;
+import com.anshdeep.dailytech.dagger.module.ApplicationModule;
 
 /**
  * Created by ANSHDEEP on 11-08-2017.
@@ -12,24 +13,37 @@ import com.anshdeep.dailytech.dagger.DaggerAppComponent;
 
 public class DailyTechApp extends Application {
 
-    private AppComponent appComponent;
+    private ApplicationComponent mApplicationComponent;
 
-    public AppComponent getAppComponent() {
-        return appComponent;
+    private static DailyTechApp instance;
+
+    public static DailyTechApp get(Context context) {
+        return (DailyTechApp) context.getApplicationContext();
     }
 
-    protected AppComponent initDagger(DailyTechApp application) {
-        return DaggerAppComponent.builder()
-                .appModule(new AppModule(application))
-                .build();
+    public static Context getContext() {
+        return instance;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
+//        mApplicationComponent = DaggerApplicationComponent.builder()
+//                .applicationModule(new ApplicationModule(this)).build();
 
-        // This initializes the appComponent field when the application first starts up.
-        appComponent = initDagger(this);
+//        mApplicationComponent.inject(this);
+
+
+    }
+
+    public ApplicationComponent getComponent() {
+        if (mApplicationComponent == null) {
+            mApplicationComponent = DaggerApplicationComponent.builder()
+                    .applicationModule(new ApplicationModule(this))
+                    .build();
+        }
+        return mApplicationComponent;
     }
 
 }

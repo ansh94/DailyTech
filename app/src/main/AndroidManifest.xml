@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.ArticlesActivity.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:configChanges="orientation|screenSize">>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -24,18 +24,18 @@
         </activity>
 
         <activity
-            android:name=".ui.DetailActivity.DetailActivity">
+            android:name=".ui.detail.DetailActivity">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.anshdeep.dailytech.ui.ArticlesActivity.MainActivity"/>
+                android:value="com.anshdeep.dailytech.ui.main.MainActivity"/>
         </activity>
 
         <activity
-            android:name=".ui.FavoriteMovieActivity.FavoriteMovieActivity">
+            android:name=".ui.favorite.FavoriteMovieActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.anshdeep.dailytech.ui.ArticlesActivity.MainActivity"/>
+                android:value="com.anshdeep.dailytech.ui.main.MainActivity"/>
         </activity>
 
         <!-- Register the ArticleContentProvider -->
