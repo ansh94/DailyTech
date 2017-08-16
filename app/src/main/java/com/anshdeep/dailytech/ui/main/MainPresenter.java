@@ -3,6 +3,7 @@ package com.anshdeep.dailytech.ui.main;
 import android.content.Context;
 import android.util.Log;
 
+import com.anshdeep.dailytech.DailyTechApp;
 import com.anshdeep.dailytech.api.model.NewsResponse;
 import com.anshdeep.dailytech.dagger.ActivityContext;
 import com.anshdeep.dailytech.network.NewsApiInterface;
@@ -29,6 +30,7 @@ public class MainPresenter extends BasePresenter<MainView> {
     @Inject
     public MainPresenter(@ActivityContext Context context) {
         super(context);
+        DailyTechApp.get(context).getComponent().inject(this);
     }
 
     @Override
@@ -40,13 +42,6 @@ public class MainPresenter extends BasePresenter<MainView> {
     public void onDetach() {
         super.onDetach();
     }
-
-
-//
-//
-//    public MainPresenter(Context context) {
-//        ((DailyTechApp) context).getAppComponent().inject(this);
-//    }
 
 
     public void getArticles(String source, String apiKey) {

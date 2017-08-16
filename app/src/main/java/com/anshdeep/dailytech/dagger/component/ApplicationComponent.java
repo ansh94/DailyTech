@@ -20,6 +20,8 @@ import android.content.Context;
 
 import com.anshdeep.dailytech.dagger.ApplicationContext;
 import com.anshdeep.dailytech.dagger.module.ApplicationModule;
+import com.anshdeep.dailytech.dagger.module.NetworkModule;
+import com.anshdeep.dailytech.ui.main.MainPresenter;
 
 import javax.inject.Singleton;
 
@@ -27,11 +29,15 @@ import dagger.Component;
 
 
 @Singleton
-@Component(modules = ApplicationModule.class)
+@Component(modules = {ApplicationModule.class, NetworkModule.class})
 public interface ApplicationComponent {
 
     @ApplicationContext
     Context context();
+
+    // inject network module in Main Presenter
+    void inject(MainPresenter target);
+
 
     Application application();
 

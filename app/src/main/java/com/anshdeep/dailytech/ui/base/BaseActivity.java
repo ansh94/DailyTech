@@ -50,8 +50,6 @@ public abstract class BaseActivity extends AppCompatActivity implements MvpView 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     public ActivityComponent getActivityComponent() {

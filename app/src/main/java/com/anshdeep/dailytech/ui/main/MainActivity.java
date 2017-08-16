@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.anshdeep.dailytech.BuildConfig;
@@ -48,8 +47,6 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
     @BindView(R.id.nav_view) NavigationView navigationView;
 
     @BindView(R.id.subtitle) TextView toolbarSubtitle;
-
-    @BindView(R.id.progress_bar) ProgressBar progressBar;
 
     @BindView(R.id.swipeRefresh) SwipeRefreshLayout mSwipeRefresh;
 
@@ -298,6 +295,13 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
         adapter = new ArticlesAdapter(listOfArticles, this, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.onDetach();
 
     }
 
