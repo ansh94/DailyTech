@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anshdeep.dailytech.R;
-import com.anshdeep.dailytech.api.model.Article;
+import com.anshdeep.dailytech.data.model.Article;
 import com.anshdeep.dailytech.data.ArticleContract;
 import com.anshdeep.dailytech.util.NetworkUtils;
 import com.bumptech.glide.Glide;

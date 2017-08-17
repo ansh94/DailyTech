@@ -34,6 +34,7 @@ public class BasePresenter<V extends MvpView> implements MvpPresenter<V> {
     private V mMvpView;
 
 
+
     protected BasePresenter(Context context) {
         this.context = context;
     }

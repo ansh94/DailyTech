@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.anshdeep.dailytech.R;
-import com.anshdeep.dailytech.api.model.Article;
+import com.anshdeep.dailytech.data.model.Article;
 import com.anshdeep.dailytech.util.DateUtil;
 import com.bumptech.glide.Glide;
 

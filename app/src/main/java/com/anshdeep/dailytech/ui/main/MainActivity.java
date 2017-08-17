@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.anshdeep.dailytech.BuildConfig;
 import com.anshdeep.dailytech.R;
-import com.anshdeep.dailytech.api.model.Article;
+import com.anshdeep.dailytech.data.model.Article;
 import com.anshdeep.dailytech.ui.base.BaseActivity;
 import com.anshdeep.dailytech.ui.detail.DetailActivity;
 import com.anshdeep.dailytech.ui.favorite.FavoriteMovieActivity;
@@ -54,18 +54,13 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
 
     @BindView(R.id.appBar) AppBarLayout appBar;
 
-    ArticlesAdapter adapter;
-    LinearLayoutManager mLinearLayoutManager;
-
+    private ArticlesAdapter adapter;
+    private LinearLayoutManager mLinearLayoutManager;
     private static final String EXTRA_ARTICLES = "EXTRA_ARTICLES";
-
-    String apiKey = BuildConfig.NEWS_API_KEY;
-    String retrofitUrlSourceName;
-    List<Article> listOfArticles = new ArrayList<>();
-
+    private String apiKey = BuildConfig.NEWS_API_KEY;
+    private List<Article> listOfArticles = new ArrayList<>();
     private ActionBarDrawerToggle drawerToggle;
-
-    boolean flag = true; //flag to hide progress bar when swipe refresh is triggered
+    private boolean flag = true; //flag to hide progress bar when swipe refresh is triggered
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +74,7 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
         mPresenter.onAttach(MainActivity.this);
 
         setUp();
+
 
         if (savedInstanceState != null) {
             ArrayList<Article> articles = savedInstanceState.getParcelableArrayList(EXTRA_ARTICLES);
@@ -97,7 +93,7 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
         }
 
         if (NetworkUtils.checkConnection(this)) {
-            mPresenter.getArticles(retrofitUrlSourceName, apiKey);
+            mPresenter.getArticles(apiKey);
             flag = true;
         } else if (!NetworkUtils.checkConnection(this)) {
             showMessage("Please check your internet connection!");
@@ -110,10 +106,6 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
         }
     }
 
-    // `onPostCreate` called when activity start-up is complete after `onStart()`
-    // NOTE 1: Make sure to override the method with only a single `Bundle` argument
-    // Note 2: Make sure you implement the correct `onPostCreate(Bundle savedInstanceState)` method.
-    // There are 2 signatures and only `onPostCreate(Bundle state)` shows the hamburger icon.
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -129,21 +121,19 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
     }
 
 
-    private void performDrawerItemAction(String sourceName, String urlSourceName) {
-
-        if (sourceName == null) {
-            toolbarSubtitle.setText(" " + R.string.techcrunch);
-            retrofitUrlSourceName = "techcrunch";
-        } else if (!toolbarSubtitle.getText().equals(" " + sourceName)) {
-            toolbarSubtitle.setText(" " + sourceName);
-
-            SharedPreferences.Editor sharedPref = this.getPreferences(Context.MODE_PRIVATE).edit();
-            sharedPref.putString("SUBTITLE", sourceName);
-            sharedPref.putString("URL_SOURCE_NAME", urlSourceName);
-            sharedPref.commit();
-
-            retrofitUrlSourceName = urlSourceName;
+    private void performDrawerItemAction(String subtitle, String urlSourceName) {
+        if (subtitle == null) {
+            mPresenter.updateSharedPrefs("TechCrunch", "techcrunch");
+            updateSubtitle("TechCrunch");
             performLoading();
+        } else {
+
+            //to prevent loading when same item is clicked again
+            if (!subtitle.equals(mPresenter.getSubtitle())) {
+                mPresenter.updateSharedPrefs(subtitle, urlSourceName);
+                updateSubtitle(subtitle);
+                performLoading();
+            }
 
         }
 
@@ -262,11 +252,12 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
                 }
         );
 
-        //read share preference and call
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        String restoredSubTitle = sharedPref.getString("SUBTITLE", null);
-        String restoredRetrofitUrlSourceName = sharedPref.getString("URL_SOURCE_NAME", null);
-        performDrawerItemAction(restoredSubTitle, restoredRetrofitUrlSourceName);
+        if (mPresenter.getSubtitle() == null) {
+            performDrawerItemAction(null, null);
+        } else {
+            updateSubtitle(mPresenter.getSubtitle());
+            performLoading();
+        }
     }
 
 
@@ -281,8 +272,9 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
         mDrawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();  //IMPORTANT: without this hamburger icon will not come
 
-        setUpNavMenu();
         setUpRecyclerView();
+        setUpNavMenu();
+
 
         //set onRefreshListener on SwipeRefreshLayout
         mSwipeRefresh.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
@@ -314,6 +306,11 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
     public void showArticles(List<Article> articleList) {
         adapter.setDataAdapter(articleList);
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void updateSubtitle(String subtitle) {
+        toolbarSubtitle.setText(" " + subtitle);
     }
 
 }

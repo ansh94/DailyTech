@@ -1,4 +1,4 @@
-package com.anshdeep.dailytech.api.model;
+package com.anshdeep.dailytech.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

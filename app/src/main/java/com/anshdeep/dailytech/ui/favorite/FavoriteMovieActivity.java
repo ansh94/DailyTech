@@ -14,7 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import com.anshdeep.dailytech.R;
-import com.anshdeep.dailytech.api.model.Article;
+import com.anshdeep.dailytech.data.model.Article;
 import com.anshdeep.dailytech.data.ArticleContract;
 import com.anshdeep.dailytech.ui.CustomCursorAdapter;
 import com.anshdeep.dailytech.ui.detail.DetailActivity;

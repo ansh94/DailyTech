@@ -21,6 +21,7 @@ import android.content.Context;
 import com.anshdeep.dailytech.dagger.ApplicationContext;
 import com.anshdeep.dailytech.dagger.module.ApplicationModule;
 import com.anshdeep.dailytech.dagger.module.NetworkModule;
+import com.anshdeep.dailytech.data.prefs.AppPreferencesHelper;
 import com.anshdeep.dailytech.ui.main.MainPresenter;
 
 import javax.inject.Singleton;
@@ -41,5 +42,6 @@ public interface ApplicationComponent {
 
     Application application();
 
+    AppPreferencesHelper prefManager();
 
 }

@@ -1,4 +1,6 @@
-package com.anshdeep.dailytech.api.model;
+package com.anshdeep.dailytech.network.model;
+
+import com.anshdeep.dailytech.data.model.Article;
 
 import java.util.List;
 

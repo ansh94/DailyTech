@@ -4,7 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.anshdeep.dailytech.DailyTechApp;
-import com.anshdeep.dailytech.api.model.NewsResponse;
+import com.anshdeep.dailytech.data.prefs.AppPreferencesHelper;
+import com.anshdeep.dailytech.network.model.NewsResponse;
 import com.anshdeep.dailytech.dagger.ActivityContext;
 import com.anshdeep.dailytech.network.NewsApiInterface;
 import com.anshdeep.dailytech.ui.base.BasePresenter;
@@ -28,6 +29,9 @@ public class MainPresenter extends BasePresenter<MainView> {
     NewsApiInterface newsApi;
 
     @Inject
+    AppPreferencesHelper prefHelper;
+
+    @Inject
     public MainPresenter(@ActivityContext Context context) {
         super(context);
         DailyTechApp.get(context).getComponent().inject(this);
@@ -44,7 +48,8 @@ public class MainPresenter extends BasePresenter<MainView> {
     }
 
 
-    public void getArticles(String source, String apiKey) {
+    public void getArticles(String apiKey) {
+        String source = prefHelper.getSourceName();
         newsApi.getArticles(source, apiKey)
                 .enqueue(new Callback<NewsResponse>() {
                     @Override
@@ -66,4 +71,14 @@ public class MainPresenter extends BasePresenter<MainView> {
                     }
                 });
     }
+
+    public void updateSharedPrefs(String subtitle, String sourceName) {
+        prefHelper.setSubtitle(subtitle);
+        prefHelper.setSourceName(sourceName);
+    }
+
+    public String getSubtitle() {
+        return prefHelper.getSubtitle();
+    }
+
 }

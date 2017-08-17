@@ -21,6 +21,10 @@ import android.content.Context;
 import com.anshdeep.dailytech.BuildConfig;
 import com.anshdeep.dailytech.dagger.ApiInfo;
 import com.anshdeep.dailytech.dagger.ApplicationContext;
+import com.anshdeep.dailytech.data.prefs.AppPreferencesHelper;
+import com.anshdeep.dailytech.data.prefs.PreferencesHelper;
+
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -53,5 +57,10 @@ public class ApplicationModule {
         return BuildConfig.NEWS_API_KEY;
     }
 
+    @Provides
+    @Singleton
+    PreferencesHelper providePrefManager(@ApplicationContext Context context) {
+        return new AppPreferencesHelper(context);
+    }
 
 }

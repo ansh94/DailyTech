@@ -1,6 +1,6 @@
 package com.anshdeep.dailytech.network;
 
-import com.anshdeep.dailytech.api.model.NewsResponse;
+import com.anshdeep.dailytech.network.model.NewsResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
