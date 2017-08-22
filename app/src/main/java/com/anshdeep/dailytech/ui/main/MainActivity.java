@@ -86,7 +86,6 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
 
     }
 
-    //should move this method in presenter
     private void performLoading() {
         if (flag) {
             showLoading();
@@ -159,8 +158,7 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
 
         int id = item.getItemId();
         if (id == R.id.action_favorites) {
-            Intent favoritesIntent = new Intent(this, FavoriteMovieActivity.class);
-            startActivity(favoritesIntent);
+            mPresenter.onMenuActionFavoriteClick();
             return true;
         }
 
@@ -311,6 +309,12 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
     @Override
     public void updateSubtitle(String subtitle) {
         toolbarSubtitle.setText(" " + subtitle);
+    }
+
+    @Override
+    public void openFavoriteActivity() {
+        Intent favoritesIntent = new Intent(this, FavoriteMovieActivity.class);
+        startActivity(favoritesIntent);
     }
 
 }

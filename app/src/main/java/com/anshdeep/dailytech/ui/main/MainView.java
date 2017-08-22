@@ -17,4 +17,6 @@ interface MainView extends MvpView {
 
     void updateSubtitle(String subtitle);
 
+    void openFavoriteActivity();
+
 }

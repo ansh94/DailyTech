@@ -81,4 +81,8 @@ public class MainPresenter extends BasePresenter<MainView> {
         return prefHelper.getSubtitle();
     }
 
+    public void onMenuActionFavoriteClick(){
+        getMvpView().openFavoriteActivity();
+    }
+
 }
