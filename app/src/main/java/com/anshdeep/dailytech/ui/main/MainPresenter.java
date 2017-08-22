@@ -4,10 +4,11 @@ import android.content.Context;
 import android.util.Log;
 
 import com.anshdeep.dailytech.DailyTechApp;
-import com.anshdeep.dailytech.data.prefs.AppPreferencesHelper;
-import com.anshdeep.dailytech.network.model.NewsResponse;
 import com.anshdeep.dailytech.dagger.ActivityContext;
+import com.anshdeep.dailytech.data.model.Article;
+import com.anshdeep.dailytech.data.prefs.AppPreferencesHelper;
 import com.anshdeep.dailytech.network.NewsApiInterface;
+import com.anshdeep.dailytech.network.model.NewsResponse;
 import com.anshdeep.dailytech.ui.base.BasePresenter;
 
 import javax.inject.Inject;
@@ -81,8 +82,11 @@ public class MainPresenter extends BasePresenter<MainView> {
         return prefHelper.getSubtitle();
     }
 
-    public void onMenuActionFavoriteClick(){
-        getMvpView().openFavoriteActivity();
+    public void onMenuActionFavoriteClick() {
+        getMvpView().openFavoriteArticlesActivity();
     }
 
+    public void onArticleClick(Article article) {
+        getMvpView().openArticleDetailActivity(article);
+    }
 }

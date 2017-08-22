@@ -1,8 +1,6 @@
 package com.anshdeep.dailytech.ui.main;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -169,7 +167,6 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
     public void onRefresh() {
         flag = false;
         performLoading();
-
     }
 
     @Override
@@ -184,13 +181,7 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
 
     @Override
     public void onClick(Article article) {
-        //read share preference and call
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        String restoredSubTitle = sharedPref.getString("SUBTITLE", "TechCrunch");
-        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        intent.putExtra("Article", article);
-        intent.putExtra("Source", restoredSubTitle);
-        startActivity(intent);
+        mPresenter.onArticleClick(article);
     }
 
     @Override
@@ -312,9 +303,17 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
     }
 
     @Override
-    public void openFavoriteActivity() {
+    public void openFavoriteArticlesActivity() {
         Intent favoritesIntent = new Intent(this, FavoriteMovieActivity.class);
         startActivity(favoritesIntent);
+    }
+
+    @Override
+    public void openArticleDetailActivity(Article article) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("Article", article);
+        intent.putExtra("Source", mPresenter.getSubtitle());
+        startActivity(intent);
     }
 
 }
