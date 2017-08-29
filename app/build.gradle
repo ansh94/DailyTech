@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 25
@@ -23,6 +24,10 @@ android {
     buildTypes.each {
         it.buildConfigField 'String', 'NEWS_API_KEY', NewsApiKey
     }
+}
+
+greendao {
+    schemaVersion 1
 }
 
 dependencies {
@@ -62,5 +67,8 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:2.8"
     provided 'javax.annotation:jsr250-api:1.0'
     compile 'javax.inject:javax.inject:1'
+
+    // greendao orm for database
+    compile 'org.greenrobot:greendao:3.2.2'
 
 }

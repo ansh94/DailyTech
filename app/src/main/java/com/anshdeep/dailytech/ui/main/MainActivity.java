@@ -312,8 +312,8 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
     public void openArticleDetailActivity(Article article) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("Article", article);
+        intent.putExtra("ArticleUrl", article.getUrl());
         intent.putExtra("Source", mPresenter.getSubtitle());
         startActivity(intent);
     }
-
 }
