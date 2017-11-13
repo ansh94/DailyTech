@@ -13,16 +13,15 @@
  * limitations under the License
  */
 
-package com.anshdeep.dailytech.dagger.component;
+package com.anshdeep.dailytech.di.component;
 
 import android.app.Application;
 import android.content.Context;
 
-import com.anshdeep.dailytech.dagger.ApplicationContext;
-import com.anshdeep.dailytech.dagger.module.ApplicationModule;
-import com.anshdeep.dailytech.dagger.module.NetworkModule;
-import com.anshdeep.dailytech.data.prefs.AppPreferencesHelper;
-import com.anshdeep.dailytech.ui.main.MainPresenter;
+import com.anshdeep.dailytech.DailyTechApp;
+import com.anshdeep.dailytech.data.DataManager;
+import com.anshdeep.dailytech.di.ApplicationContext;
+import com.anshdeep.dailytech.di.module.ApplicationModule;
 
 import javax.inject.Singleton;
 
@@ -30,18 +29,15 @@ import dagger.Component;
 
 
 @Singleton
-@Component(modules = {ApplicationModule.class, NetworkModule.class})
+@Component(modules = ApplicationModule.class)
 public interface ApplicationComponent {
+
+    void inject(DailyTechApp app);
 
     @ApplicationContext
     Context context();
 
-    // inject network module in Main Presenter
-    void inject(MainPresenter target);
-
-
     Application application();
 
-    AppPreferencesHelper prefManager();
-
+    DataManager getDataManager();
 }

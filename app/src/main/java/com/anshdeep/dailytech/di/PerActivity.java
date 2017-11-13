@@ -13,22 +13,16 @@
  * limitations under the License
  */
 
-package com.anshdeep.dailytech.ui.base;
+package com.anshdeep.dailytech.di;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import javax.inject.Scope;
 
 
-import com.androidnetworking.error.ANError;
-
-/**
- * Every presenter in the app must either implement this interface or extend BasePresenter
- * indicating the MvpView type that wants to be attached with.
- */
-public interface MvpPresenter<V extends MvpView> {
-
-    void onAttach(V mvpView);
-
-    void onDetach();
-
-    void handleApiError(ANError error);
-
-
+@Scope
+@Retention(RetentionPolicy.RUNTIME)
+public @interface PerActivity {
 }
+

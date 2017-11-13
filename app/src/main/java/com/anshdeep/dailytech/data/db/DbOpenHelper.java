@@ -1,19 +1,26 @@
-package com.anshdeep.dailytech.data;
+package com.anshdeep.dailytech.data.db;
 
 import android.content.Context;
 import android.util.Log;
 
+import com.anshdeep.dailytech.di.ApplicationContext;
+import com.anshdeep.dailytech.di.DatabaseInfo;
 import com.anshdeep.dailytech.data.model.DaoMaster;
 
 import org.greenrobot.greendao.database.Database;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Created by ANSHDEEP on 29-08-2017.
  */
 
+@Singleton
 public class DbOpenHelper extends DaoMaster.OpenHelper {
 
-    public DbOpenHelper(Context context, String name) {
+    @Inject
+    public DbOpenHelper(@ApplicationContext Context context, @DatabaseInfo String name) {
         super(context, name);
     }
 

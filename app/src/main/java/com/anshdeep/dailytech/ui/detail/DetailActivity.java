@@ -1,17 +1,12 @@
 package com.anshdeep.dailytech.ui.detail;
 
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ShareCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -20,13 +15,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anshdeep.dailytech.R;
-import com.anshdeep.dailytech.data.AppDbHelper;
-import com.anshdeep.dailytech.data.DbOpenHelper;
+import com.anshdeep.dailytech.data.db.AppDbHelper;
+import com.anshdeep.dailytech.data.db.DbOpenHelper;
 import com.anshdeep.dailytech.data.model.Article;
 import com.anshdeep.dailytech.util.NetworkUtils;
 import com.bumptech.glide.Glide;
 import com.like.LikeButton;
-import com.like.OnLikeListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -94,13 +88,13 @@ public class DetailActivity extends AppCompatActivity {
         heartButton = (LikeButton) findViewById(R.id.heart_button);
         if (articleUrl != null) {
 
-            article = appDbHelper.returnArticleByUrl(articleUrl);
+//            article = appDbHelper.returnArticleByUrl(articleUrl);
 
             if (article == null) {
                 article = intent.getParcelableExtra("Article");
             }
 
-            updateFavoriteButtons();
+//            updateFavoriteButtons();
 
             //set thumbnail associated with the article
             Glide.with(this)
@@ -119,7 +113,7 @@ public class DetailActivity extends AppCompatActivity {
             // set title
             newsDescription.setText(article.getDescription());
 
-            setupChromeCustomTabs();
+//            setupChromeCustomTabs();
 
             btnOpenArticle.setText(getString(R.string.read_full_article) + " " + source);
             // button click handling
@@ -159,176 +153,176 @@ public class DetailActivity extends AppCompatActivity {
                 .startChooser();
     }
 
-    public void updateFavoriteButtons() {
-        Log.d("DetailActivity", "update favorite buttons : " + article.getUrl());
-
-        boolean result = appDbHelper.isArticlePresent(article.getUrl());
-
-        Log.d("DetailActivity", "isFavorite: " + result);
-        if (result) {
-            heartButton.setLiked(true);
-        } else {
-            heartButton.setLiked(false);
-        }
-        updateAllWidgets();
-
-//        new AsyncTask<Void, Void, Boolean>() {
+//    public void updateFavoriteButtons() {
+//        Log.d("DetailActivity", "update favorite buttons : " + article.getUrl());
 //
-//            @Override
-//            protected Boolean doInBackground(Void... params) {
-//                return isFavorite();
-//            }
+////        boolean result = appDbHelper.isArticlePresent(article.getUrl());
 //
-//            @Override
-//            protected void onPostExecute(Boolean isFavorite) {
-//                if (isFavorite) {
-//                    heartButton.setLiked(true);
-//                } else {
-//                    heartButton.setLiked(false);
-//                }
-//                updateAllWidgets();
-//
-//            }
-//        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-
-        heartButton.setOnLikeListener(new OnLikeListener() {
-            @Override
-            public void liked(LikeButton likeButton) {
-                markAsFavorite();
-            }
-
-            @Override
-            public void unLiked(LikeButton likeButton) {
-                removeFromFavorites();
-            }
-        });
-
-
-    }
-
-    private void updateAllWidgets() {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, ArticleWidgetProvider.class));
-        if (appWidgetIds.length > 0) {
-            new ArticleWidgetProvider().onUpdate(this, appWidgetManager, appWidgetIds);
-        }
-    }
-
-//    private boolean isFavorite() {
-//        Cursor movieCursor = getContentResolver().query(
-//                ArticleContract.ArticleEntry.CONTENT_URI,
-//                new String[]{ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL},
-//                ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL + " = " + "'" + article.getUrl() + "'",
-//                null,
-//                null);
-//
-//        if (movieCursor != null && movieCursor.moveToFirst()) {
-//            movieCursor.close();
-//            return true;
+//        Log.d("DetailActivity", "isFavorite: " + result);
+//        if (result) {
+//            heartButton.setLiked(true);
 //        } else {
-//            return false;
+//            heartButton.setLiked(false);
+//        }
+//        updateAllWidgets();
+//
+////        new AsyncTask<Void, Void, Boolean>() {
+////
+////            @Override
+////            protected Boolean doInBackground(Void... params) {
+////                return isFavorite();
+////            }
+////
+////            @Override
+////            protected void onPostExecute(Boolean isFavorite) {
+////                if (isFavorite) {
+////                    heartButton.setLiked(true);
+////                } else {
+////                    heartButton.setLiked(false);
+////                }
+////                updateAllWidgets();
+////
+////            }
+////        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//
+//
+//        heartButton.setOnLikeListener(new OnLikeListener() {
+//            @Override
+//            public void liked(LikeButton likeButton) {
+//                markAsFavorite();
+//            }
+//
+//            @Override
+//            public void unLiked(LikeButton likeButton) {
+//                removeFromFavorites();
+//            }
+//        });
+//
+//
+//    }
+//
+//    private void updateAllWidgets() {
+//        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+//        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, ArticleWidgetProvider.class));
+//        if (appWidgetIds.length > 0) {
+//            new ArticleWidgetProvider().onUpdate(this, appWidgetManager, appWidgetIds);
 //        }
 //    }
-
-    public void markAsFavorite() {
-
-        boolean result = appDbHelper.isArticlePresent(article.getUrl());
-
-        if (!result) {
-//            Article newArticle = new Article();
-//            newArticle.setAuthor(article.getAuthor());
-//            newArticle.setTitle(article.getTitle());
-//            newArticle.setDescription(article.getDescription());
-//            newArticle.setUrl(article.getUrl());
-//            newArticle.setUrlToImage(article.getUrlToImage());
-//            newArticle.setPublishedAt(article.getPublishedAt());
-//            newArticle.setSource(source);
-            appDbHelper.insertArticle(article);
-            Log.d("ArticleDao", "Inserted new article, ID: " + article.getId());
-            updateFavoriteButtons();
-            Snackbar.make(parentView, R.string.article_added, Snackbar.LENGTH_LONG).show();
-        }
-
-//        new AsyncTask<Void, Void, Void>() {
 //
-//            @Override
-//            protected Void doInBackground(Void... params) {
-//                if (!isFavorite()) {
-//                    ContentValues articleValues = new ContentValues();
-//                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_AUTHOR,
-//                            article.getAuthor());
-//                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_TITLE,
-//                            article.getTitle());
-//                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_DESCRIPTION,
-//                            article.getDescription());
-//                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL,
-//                            article.getUrl());
-//                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_IMAGE_URL,
-//                            article.getUrlToImage());
-//                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_TIME,
-//                            article.getPublishedAt());
-//                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_SOURCE,
-//                            source);
+////    private boolean isFavorite() {
+////        Cursor movieCursor = getContentResolver().query(
+////                ArticleContract.ArticleEntry.CONTENT_URI,
+////                new String[]{ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL},
+////                ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL + " = " + "'" + article.getUrl() + "'",
+////                null,
+////                null);
+////
+////        if (movieCursor != null && movieCursor.moveToFirst()) {
+////            movieCursor.close();
+////            return true;
+////        } else {
+////            return false;
+////        }
+////    }
 //
-//                    // Insert the content values via a ContentResolver
-//                    Uri uri = getContentResolver().insert(
-//                            ArticleContract.ArticleEntry.CONTENT_URI,
-//                            articleValues
-//                    );
+//    public void markAsFavorite() {
 //
+//        boolean result = appDbHelper.isArticlePresent(article.getUrl());
 //
-//                }
-//                return null;
-//            }
+//        if (!result) {
+////            Article newArticle = new Article();
+////            newArticle.setAuthor(article.getAuthor());
+////            newArticle.setTitle(article.getTitle());
+////            newArticle.setDescription(article.getDescription());
+////            newArticle.setUrl(article.getUrl());
+////            newArticle.setUrlToImage(article.getUrlToImage());
+////            newArticle.setPublishedAt(article.getPublishedAt());
+////            newArticle.setSource(source);
+//            appDbHelper.insertArticle(article);
+//            Log.d("ArticleDao", "Inserted new article, ID: " + article.getId());
+//            updateFavoriteButtons();
+//            Snackbar.make(parentView, R.string.article_added, Snackbar.LENGTH_LONG).show();
+//        }
 //
-//            @Override
-//            protected void onPostExecute(Void aVoid) {
-//                updateFavoriteButtons();
-//                Snackbar.make(parentView, R.string.article_added, Snackbar.LENGTH_LONG).show();
-//            }
-//        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-
-    public void removeFromFavorites() {
-
-        boolean result = appDbHelper.isArticlePresent(article.getUrl());
-
-        if (result) {
-            appDbHelper.removeArticle(article);
-            updateFavoriteButtons();
-            Snackbar.make(parentView, R.string.article_removed, Snackbar.LENGTH_LONG).show();
-        }
-
-
-//        new AsyncTask<Void, Void, Void>() {
-//
-//            @Override
-//            protected Void doInBackground(Void... params) {
-//                if (isFavorite()) {
-//                    getContentResolver().delete(ArticleContract.ArticleEntry.CONTENT_URI,
-//                            ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL + " = " + "'" + article.getUrl() + "'", null);
+////        new AsyncTask<Void, Void, Void>() {
+////
+////            @Override
+////            protected Void doInBackground(Void... params) {
+////                if (!isFavorite()) {
+////                    ContentValues articleValues = new ContentValues();
+////                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_AUTHOR,
+////                            article.getAuthor());
+////                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_TITLE,
+////                            article.getTitle());
+////                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_DESCRIPTION,
+////                            article.getDescription());
+////                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL,
+////                            article.getUrl());
+////                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_IMAGE_URL,
+////                            article.getUrlToImage());
+////                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_TIME,
+////                            article.getPublishedAt());
+////                    articleValues.put(ArticleContract.ArticleEntry.COLUMN_ARTICLE_SOURCE,
+////                            source);
+////
+////                    // Insert the content values via a ContentResolver
+////                    Uri uri = getContentResolver().insert(
+////                            ArticleContract.ArticleEntry.CONTENT_URI,
+////                            articleValues
+////                    );
+////
+////
+////                }
+////                return null;
+////            }
+////
+////            @Override
+////            protected void onPostExecute(Void aVoid) {
+////                updateFavoriteButtons();
+////                Snackbar.make(parentView, R.string.article_added, Snackbar.LENGTH_LONG).show();
+////            }
+////        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//    }
 //
 //
-//                }
-//                return null;
-//            }
+//    public void removeFromFavorites() {
 //
-//            @Override
-//            protected void onPostExecute(Void aVoid) {
-//                updateFavoriteButtons();
-//                Snackbar.make(parentView, R.string.article_removed, Snackbar.LENGTH_LONG).show();
-//            }
-//        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-
-    private void setupChromeCustomTabs() {
-        customTabsIntent = new CustomTabsIntent.Builder()
-                .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                .setShowTitle(true)
-                .build();
-
-    }
+//        boolean result = appDbHelper.isArticlePresent(article.getUrl());
+//
+//        if (result) {
+//            appDbHelper.removeArticle(article);
+//            updateFavoriteButtons();
+//            Snackbar.make(parentView, R.string.article_removed, Snackbar.LENGTH_LONG).show();
+//        }
+//
+//
+////        new AsyncTask<Void, Void, Void>() {
+////
+////            @Override
+////            protected Void doInBackground(Void... params) {
+////                if (isFavorite()) {
+////                    getContentResolver().delete(ArticleContract.ArticleEntry.CONTENT_URI,
+////                            ArticleContract.ArticleEntry.COLUMN_ARTICLE_URL + " = " + "'" + article.getUrl() + "'", null);
+////
+////
+////                }
+////                return null;
+////            }
+////
+////            @Override
+////            protected void onPostExecute(Void aVoid) {
+////                updateFavoriteButtons();
+////                Snackbar.make(parentView, R.string.article_removed, Snackbar.LENGTH_LONG).show();
+////            }
+////        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//    }
+//
+//
+//    private void setupChromeCustomTabs() {
+//        customTabsIntent = new CustomTabsIntent.Builder()
+//                .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
+//                .setShowTitle(true)
+//                .build();
+//
+//    }
 }

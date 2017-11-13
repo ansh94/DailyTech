@@ -1,41 +1,43 @@
 package com.anshdeep.dailytech.ui.main;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.anshdeep.dailytech.DailyTechApp;
-import com.anshdeep.dailytech.dagger.ActivityContext;
+import com.androidnetworking.error.ANError;
+import com.anshdeep.dailytech.data.DataManager;
 import com.anshdeep.dailytech.data.model.Article;
-import com.anshdeep.dailytech.data.prefs.AppPreferencesHelper;
-import com.anshdeep.dailytech.network.NewsApiInterface;
 import com.anshdeep.dailytech.network.model.NewsResponse;
 import com.anshdeep.dailytech.ui.base.BasePresenter;
+import com.anshdeep.dailytech.util.rx.SchedulerProvider;
 
 import javax.inject.Inject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by ANSHDEEP on 11-08-2017.
  */
+
 
 public class MainPresenter extends BasePresenter<MainView> {
 
 
     private static final String TAG = "MainPresenter";
 
-    @Inject
-    NewsApiInterface newsApi;
+//    @Inject
+//    NewsApiInterface newsApi;
+
+//    @Inject
+//    AppPreferencesHelper prefHelper;
+
+//    @Inject
+//    public MainPresenter(@ActivityContext Context context) {
+//        super(context);
+//        DailyTechApp.get(context).getComponent().inject(this);
+//    }
 
     @Inject
-    AppPreferencesHelper prefHelper;
-
-    @Inject
-    public MainPresenter(@ActivityContext Context context) {
-        super(context);
-        DailyTechApp.get(context).getComponent().inject(this);
+    public MainPresenter(DataManager dataManager, SchedulerProvider schedulerProvider,
+                         CompositeDisposable compositeDisposable) {
+        super(dataManager, schedulerProvider, compositeDisposable);
     }
 
     @Override
@@ -50,36 +52,78 @@ public class MainPresenter extends BasePresenter<MainView> {
 
 
     public void getArticles(String apiKey) {
-        String source = prefHelper.getSourceName();
-        newsApi.getArticles(source, apiKey)
-                .enqueue(new Callback<NewsResponse>() {
+        String source = getDataManager().getSourceName();
+        getMvpView().showLoading();
+
+        getCompositeDisposable().add(getDataManager()
+                .getArticlesApiCall(source, apiKey)
+                .subscribeOn(getSchedulerProvider().io())
+                .observeOn(getSchedulerProvider().ui())
+                .subscribe(new Consumer<NewsResponse>() {
                     @Override
-                    public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
+                    public void accept(NewsResponse response) throws Exception {
+
+                        if (!isViewAttached()) {
+                            return;
+                        }
+
                         getMvpView().hideLoading();
                         getMvpView().swipeToRefresh(false);
-                        if (response.body().getArticles().size() > 0)
-                            getMvpView().showArticles(response.body().getArticles());
+                        if (response.getArticles().size() > 0)
+                            getMvpView().showArticles(response.getArticles());
                         else
                             getMvpView().showMessage("No news articles found");
-                    }
 
-                    @Override
-                    public void onFailure(Call<NewsResponse> call, Throwable t) {
-                        Log.e(TAG, "onError: ", t);
-                        getMvpView().onError(null);
-                        getMvpView().hideLoading();
-                        getMvpView().swipeToRefresh(false);
                     }
-                });
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                        if (!isViewAttached()) {
+                            return;
+                        }
+
+                        getMvpView().hideLoading();
+
+                        // handle the api error here
+                        if (throwable instanceof ANError) {
+                            ANError anError = (ANError) throwable;
+                            handleApiError(anError);
+                        }
+                    }
+                }));
+
+//        newsApi.getArticles(source, apiKey)
+//                .enqueue(new Callback<NewsResponse>() {
+//                    @Override
+//                    public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
+//                        getMvpView().hideLoading();
+//                        getMvpView().swipeToRefresh(false);
+//                        if (response.body().getArticles().size() > 0)
+//                            getMvpView().showArticles(response.body().getArticles());
+//                        else
+//                            getMvpView().showMessage("No news articles found");
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<NewsResponse> call, Throwable t) {
+//                        Log.e(TAG, "onError: ", t);
+//                        getMvpView().onError(null);
+//                        getMvpView().hideLoading();
+//                        getMvpView().swipeToRefresh(false);
+//                    }
+//                });
+
+
     }
 
     public void updateSharedPrefs(String subtitle, String sourceName) {
-        prefHelper.setSubtitle(subtitle);
-        prefHelper.setSourceName(sourceName);
+        getDataManager().setSubtitle(subtitle);
+        getDataManager().setSourceName(sourceName);
     }
 
     public String getSubtitle() {
-        return prefHelper.getSubtitle();
+        return getDataManager().getSubtitle();
     }
 
     public void onMenuActionFavoriteClick() {

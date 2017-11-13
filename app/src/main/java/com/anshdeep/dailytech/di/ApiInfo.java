@@ -13,16 +13,16 @@
  * limitations under the License
  */
 
-package com.anshdeep.dailytech.dagger;
+package com.anshdeep.dailytech.di;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import javax.inject.Scope;
+import javax.inject.Qualifier;
 
 
-@Scope
+
+@Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PerActivity {
+public @interface ApiInfo {
 }
-

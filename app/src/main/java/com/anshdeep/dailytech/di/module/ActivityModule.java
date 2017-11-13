@@ -13,17 +13,18 @@
  * limitations under the License
  */
 
-package com.anshdeep.dailytech.dagger.module;
+package com.anshdeep.dailytech.di.module;
 
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 
-import com.anshdeep.dailytech.dagger.ActivityContext;
-import com.anshdeep.dailytech.dagger.PerActivity;
-import com.anshdeep.dailytech.ui.main.MainPresenter;
+import com.anshdeep.dailytech.di.ActivityContext;
+import com.anshdeep.dailytech.util.rx.AppSchedulerProvider;
+import com.anshdeep.dailytech.util.rx.SchedulerProvider;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.disposables.CompositeDisposable;
 
 
 @Module
@@ -47,10 +48,20 @@ public class ActivityModule {
     }
 
     @Provides
-    @PerActivity
-    MainPresenter provideMainPresenter(@ActivityContext Context context) {
-        return new MainPresenter(context);
+    CompositeDisposable provideCompositeDisposable() {
+        return new CompositeDisposable();
     }
+
+    @Provides
+    SchedulerProvider provideSchedulerProvider() {
+        return new AppSchedulerProvider();
+    }
+
+//    @Provides
+//    @PerActivity
+//    MainPresenter provideMainPresenter(MainPresenter presenter) {
+//            return presenter;
+//    }
 
 
 //    @Provides

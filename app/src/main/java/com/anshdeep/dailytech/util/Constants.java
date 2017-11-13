@@ -10,4 +10,10 @@ public class Constants {
 
     public static final String PREF_NAME = "dailytech_pref";
 
+    public static final String DB_NAME = "dailytech_articles.db";
+
+    public static final int API_STATUS_CODE_LOCAL_ERROR = 0;
+
+
+
 }

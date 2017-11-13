@@ -13,16 +13,24 @@
  * limitations under the License
  */
 
-package com.anshdeep.dailytech.dagger.module;
+package com.anshdeep.dailytech.di.module;
 
 import android.app.Application;
 import android.content.Context;
 
 import com.anshdeep.dailytech.BuildConfig;
-import com.anshdeep.dailytech.dagger.ApiInfo;
-import com.anshdeep.dailytech.dagger.ApplicationContext;
+import com.anshdeep.dailytech.data.AppDataManager;
+import com.anshdeep.dailytech.data.DataManager;
+import com.anshdeep.dailytech.data.db.AppDbHelper;
+import com.anshdeep.dailytech.data.db.DbHelper;
+import com.anshdeep.dailytech.data.network.ApiHelper;
+import com.anshdeep.dailytech.data.network.AppApiHelper;
 import com.anshdeep.dailytech.data.prefs.AppPreferencesHelper;
 import com.anshdeep.dailytech.data.prefs.PreferencesHelper;
+import com.anshdeep.dailytech.di.ApiInfo;
+import com.anshdeep.dailytech.di.ApplicationContext;
+import com.anshdeep.dailytech.di.DatabaseInfo;
+import com.anshdeep.dailytech.util.Constants;
 
 import javax.inject.Singleton;
 
@@ -58,9 +66,35 @@ public class ApplicationModule {
     }
 
     @Provides
-    @Singleton
-    PreferencesHelper providePrefManager(@ApplicationContext Context context) {
-        return new AppPreferencesHelper(context);
+    @DatabaseInfo
+    String provideDatabaseName() {
+        return Constants.DB_NAME;
     }
+
+    @Provides
+    @Singleton
+    DataManager provideDataManager(AppDataManager appDataManager) {
+        return appDataManager;
+    }
+
+    @Provides
+    @Singleton
+    DbHelper provideDbHelper(AppDbHelper appDbHelper) {
+        return appDbHelper;
+    }
+
+    @Provides
+    @Singleton
+    PreferencesHelper providePreferencesHelper(AppPreferencesHelper appPreferencesHelper) {
+        return appPreferencesHelper;
+    }
+
+    @Provides
+    @Singleton
+    ApiHelper provideApiHelper(AppApiHelper appApiHelper) {
+        return appApiHelper;
+    }
+
+
 
 }

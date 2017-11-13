@@ -30,9 +30,9 @@ import android.widget.Toast;
 
 import com.anshdeep.dailytech.DailyTechApp;
 import com.anshdeep.dailytech.R;
-import com.anshdeep.dailytech.dagger.component.ActivityComponent;
-import com.anshdeep.dailytech.dagger.component.DaggerActivityComponent;
-import com.anshdeep.dailytech.dagger.module.ActivityModule;
+import com.anshdeep.dailytech.di.component.ActivityComponent;
+import com.anshdeep.dailytech.di.component.DaggerActivityComponent;
+import com.anshdeep.dailytech.di.module.ActivityModule;
 import com.anshdeep.dailytech.util.CommonUtils;
 import com.anshdeep.dailytech.util.NetworkUtils;
 
@@ -50,16 +50,13 @@ public abstract class BaseActivity extends AppCompatActivity implements MvpView 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mActivityComponent = DaggerActivityComponent.builder()
+                .activityModule(new ActivityModule(this))
+                .applicationComponent(((DailyTechApp) getApplication()).getComponent())
+                .build();
     }
 
     public ActivityComponent getActivityComponent() {
-        if (mActivityComponent == null) {
-            mActivityComponent = DaggerActivityComponent.builder()
-                    .activityModule(new ActivityModule(this))
-                    .applicationComponent(DailyTechApp.get(this).getComponent())
-                    .build();
-        }
-
         return mActivityComponent;
     }
 

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.anshdeep.dailytech.dagger.ApplicationContext;
+import com.anshdeep.dailytech.di.ApplicationContext;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

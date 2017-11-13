@@ -15,11 +15,24 @@
 
 package com.anshdeep.dailytech.ui.base;
 
-/**
- * Created by janisharali on 27/01/17.
- */
-
 import android.content.Context;
+import android.util.Log;
+
+import com.androidnetworking.common.ANConstants;
+import com.androidnetworking.error.ANError;
+import com.anshdeep.dailytech.R;
+import com.anshdeep.dailytech.data.DataManager;
+import com.anshdeep.dailytech.data.network.ApiError;
+import com.anshdeep.dailytech.util.Constants;
+import com.anshdeep.dailytech.util.rx.SchedulerProvider;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+
+import javax.inject.Inject;
+import javax.net.ssl.HttpsURLConnection;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Base class that implements the Presenter interface and provides a base implementation for
@@ -30,23 +43,25 @@ public class BasePresenter<V extends MvpView> implements MvpPresenter<V> {
 
     private static final String TAG = "BasePresenter";
 
+    private final DataManager mDataManager;
+    private final SchedulerProvider mSchedulerProvider;
+    private final CompositeDisposable mCompositeDisposable;
+
     protected Context context;
     private V mMvpView;
 
 
-
-    protected BasePresenter(Context context) {
-        this.context = context;
-    }
-
-//    @Inject
-//    public BasePresenter(DataManager dataManager,
-//                         SchedulerProvider schedulerProvider,
-//                         CompositeDisposable compositeDisposable) {
-//        this.mDataManager = dataManager;
-//        this.mSchedulerProvider = schedulerProvider;
-//        this.mCompositeDisposable = compositeDisposable;
+//    protected BasePresenter(Context context) {
+//        this.context = context;
 //    }
+
+    @Inject
+    public BasePresenter(DataManager dataManager, SchedulerProvider schedulerProvider,
+                         CompositeDisposable compositeDisposable) {
+        this.mDataManager = dataManager;
+        this.mSchedulerProvider = schedulerProvider;
+        this.mCompositeDisposable = compositeDisposable;
+    }
 
 
     @Override
@@ -56,10 +71,13 @@ public class BasePresenter<V extends MvpView> implements MvpPresenter<V> {
 
     @Override
     public void onDetach() {
+        mCompositeDisposable.dispose();
         mMvpView = null;
     }
 
-    private boolean isViewAttached() {
+
+
+    public boolean isViewAttached() {
         return mMvpView != null;
     }
 
@@ -70,6 +88,67 @@ public class BasePresenter<V extends MvpView> implements MvpPresenter<V> {
     public void checkViewAttached() {
         if (!isViewAttached()) throw new MvpViewNotAttachedException();
     }
+
+    public DataManager getDataManager() {
+        return mDataManager;
+    }
+
+    public SchedulerProvider getSchedulerProvider() {
+        return mSchedulerProvider;
+    }
+
+    public CompositeDisposable getCompositeDisposable() {
+        return mCompositeDisposable;
+    }
+
+
+
+
+    @Override
+    public void handleApiError(ANError error) {
+
+        if (error == null || error.getErrorBody() == null) {
+            getMvpView().onError(R.string.api_default_error);
+            return;
+        }
+
+        if (error.getErrorCode() == Constants.API_STATUS_CODE_LOCAL_ERROR
+                && error.getErrorDetail().equals(ANConstants.CONNECTION_ERROR)) {
+            getMvpView().onError(R.string.connection_error);
+            return;
+        }
+
+        if (error.getErrorCode() == Constants.API_STATUS_CODE_LOCAL_ERROR
+                && error.getErrorDetail().equals(ANConstants.REQUEST_CANCELLED_ERROR)) {
+            getMvpView().onError(R.string.api_retry_error);
+            return;
+        }
+
+        final GsonBuilder builder = new GsonBuilder().excludeFieldsWithoutExposeAnnotation();
+        final Gson gson = builder.create();
+
+        try {
+            ApiError apiError = gson.fromJson(error.getErrorBody(), ApiError.class);
+
+            if (apiError == null || apiError.getMessage() == null) {
+                getMvpView().onError(R.string.api_default_error);
+                return;
+            }
+
+            switch (error.getErrorCode()) {
+                case HttpsURLConnection.HTTP_UNAUTHORIZED:
+                case HttpsURLConnection.HTTP_FORBIDDEN:
+                case HttpsURLConnection.HTTP_INTERNAL_ERROR:
+                case HttpsURLConnection.HTTP_NOT_FOUND:
+                default:
+                    getMvpView().onError(apiError.getMessage());
+            }
+        } catch (JsonSyntaxException | NullPointerException e) {
+            Log.e(TAG, "handleApiError", e);
+            getMvpView().onError(R.string.api_default_error);
+        }
+    }
+
 
 
     private static class MvpViewNotAttachedException extends RuntimeException {

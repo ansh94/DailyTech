@@ -13,16 +13,21 @@
  * limitations under the License
  */
 
-package com.anshdeep.dailytech.dagger;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import javax.inject.Qualifier;
+package com.anshdeep.dailytech.di.component;
 
 
+import com.anshdeep.dailytech.di.PerActivity;
+import com.anshdeep.dailytech.di.module.ActivityModule;
+import com.anshdeep.dailytech.ui.main.MainActivity;
 
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ApiInfo {
+import dagger.Component;
+
+
+@PerActivity
+@Component(dependencies = ApplicationComponent.class, modules = ActivityModule.class)
+public interface ActivityComponent {
+
+    void inject(MainActivity activity);
+
+
 }

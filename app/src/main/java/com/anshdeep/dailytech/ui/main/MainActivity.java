@@ -35,8 +35,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends BaseActivity implements MainView, SwipeRefreshLayout.OnRefreshListener, ArticlesAdapter.ArticlesAdapterOnClickHandler {
 
 
-    @Inject
-    MainPresenter mPresenter;
+    @Inject MainPresenter mPresenter;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 
@@ -65,11 +64,11 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getActivityComponent().inject(this);
+        getActivityComponent().inject(MainActivity.this);
 
         setUnBinder(ButterKnife.bind(this));
 
-        mPresenter.onAttach(MainActivity.this);
+        mPresenter.onAttach(this);
 
         setUp();
 
@@ -281,8 +280,8 @@ public class MainActivity extends BaseActivity implements MainView, SwipeRefresh
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         mPresenter.onDetach();
+        super.onDestroy();
 
     }
 

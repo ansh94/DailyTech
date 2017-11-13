@@ -8,6 +8,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
 import org.greenrobot.greendao.annotation.Generated;
 
+
 @Entity(nameInDb = "article")
 public class Article implements Parcelable {
 
@@ -51,6 +52,7 @@ public class Article implements Parcelable {
         source = in.readString();
     }
 
+
     @Generated(hash = 433704677)
     public Article(Long id, String author, String title, String description, String url,
                    String urlToImage, String publishedAt, String source) {
@@ -64,9 +66,11 @@ public class Article implements Parcelable {
         this.source = source;
     }
 
+
     @Generated(hash = 742516792)
     public Article() {
     }
+
 
     @Override
     public int describeContents() {
